@@ -1,103 +1,168 @@
-Here’s a **professional README** for your chess project that reflects its current features, structure, and usage:
+Here’s an **updated and professional `README.md`** tailored to the current state of your project — now a fullstack web app with a FastAPI backend and a React frontend:
 
 ---
 
-## ♟️ Simple Chess in Python
+# ♟️ Simple Chess Web App
 
-A minimalist terminal-based chess game written in Python. This project allows two players to take turns playing chess via standard input, with basic piece movement and win condition detection.
-
----
-
-### 🚀 Features
-
-* Fully initialized 8x8 chessboard with standard starting positions
-* Supports all basic piece types: pawn, rook, knight, bishop, queen, king
-* Turn-based movement with alternating white/black turns
-* Capture announcements with piece name and location
-* Game-over logic when a king is captured
-* Input validation and simple error messages
-* Testable architecture with an included test suite (`test_chess.py`)
-* CLI test runner support using `python chessboard.py test`
+A fullstack Python & React chess web application. Built with a FastAPI backend serving a basic turn-based chess engine, and a React frontend for interactive play. This project emphasizes simplicity, modularity, and testable architecture.
 
 ---
 
-### 🧠 Limitations
+## 🚀 Features
 
-* No special rules: no castling, en passant, or pawn promotion
-* No check/checkmate logic — the game ends when a king is missing
-* No AI or multiplayer over network
-* Movement rules are enforced but simplified
+### 🧠 Chess Engine
+
+* Fully initialized 8x8 board with standard starting positions
+* Piece movement rules: pawn, rook, knight, bishop, queen, king
+* Turn-based logic with enforced player alternation
+* Capture announcements (via logs)
+* Game over when a king is missing
+* Structured and unit-tested game logic
+
+### 🛠 Backend (FastAPI)
+
+* REST API endpoints for:
+
+  * Fetching board state
+  * Making a move
+  * Resetting the game
+* Logging and error handling
+* Modular structure for scalability
+* Unit-tested with `unittest` and `TestClient`
+
+### 💻 Frontend (React)
+
+* Calls backend APIs to display and update game state
+* Organized with modular components and API service file
+* React + Vite setup
 
 ---
 
-### 📂 Project Structure
+## 🧪 Limitations
+
+* No check/checkmate logic — the game ends when a king is removed
+* No special rules (castling, en passant, promotion)
+* No multiplayer or AI
+* Minimal UI — currently functional, not styled
+
+---
+
+## 📁 Project Structure
 
 ```
-.
-├── chessboard.py      # Main game logic and CLI interface
-├── test_chess.py      # Unit tests for the game logic
-└── README.md          # Project documentation
+my-chess-app/
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── routes.py           # API routes (GET /board, POST /move)
+│   │   ├── core/
+│   │   │   └── game_engine.py      # Main chess logic with logging
+│   │   ├── main.py                 # FastAPI entrypoint
+│   │   └── tests/
+│   │       ├── __init__.py
+│   │       ├── test_game_engine.py # Unit tests for core logic
+│   │       └── test_api.py         # Unit tests for API
+│   └── requirements.txt
+│
+├── frontend/                       # Not yet implemented
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/api.js         # Frontend API calls to backend
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   └── vite.config.js
+│
+├── README.md
+└── run_all.sh                      # Optional: run frontend & backend together
 ```
 
 ---
 
-### ▶️ Usage
+## ▶️ Usage
 
-#### To Play:
+### 🐍 Backend (FastAPI)
+
+#### Install dependencies:
 
 ```bash
-python chessboard.py
+cd backend
+pip install -r requirements.txt
 ```
 
-Follow the prompt and enter moves like:
-
-```
-e2 e4
-g8 f6
-```
-
-#### To Run Tests:
+#### Run the server:
 
 ```bash
-python chessboard.py test
+cd app
+uvicorn main:app --reload
+```
+
+* Swagger docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+---
+
+### 🌐 Frontend (React)
+
+*Not yet implemented.*
+
+#### Install dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
+#### Start the React dev server:
+
+```bash
+npm run dev
 ```
 
 ---
 
-### 🧪 Sample Output
+### 📬 API Endpoints
 
+* `GET /api/board` — fetch current board and state
+* `POST /api/move` — submit a move `{ from_pos, to_pos }`
+* `POST /api/reset` — reset the game to initial state
+
+---
+
+## 🧪 Run Tests
+
+### Backend Unit Tests:
+
+```bash
+cd backend/app
+python -m unittest discover
 ```
-Welcome to Simple Chess!
-White's move (e.g. e2 e4): e2 e4
-Black's move (e.g. e7 e5): e7 e5
-White captures black pawn on e5!
-...
-Black wins! White's king is missing.
-Game over.
-```
+
+(Or use `pytest`)
 
 ---
 
-### ✅ Requirements
+## 📌 Todo / Improvements
 
-* Python 3.7+
-
-No external dependencies are required.
-
----
-
-### 📌 Todo (Optional Improvements)
-
-* Add check/checkmate and stalemate logic
-* Implement castling, en passant, and promotion
-* Add board annotation and move history
-* Build a GUI or online version
-* Add a computer opponent
+* Implement check, checkmate, and stalemate detection
+* Support castling, en passant, and promotion
+* Add multiplayer and authentication
+* Add move history and PGN export
+* Style the frontend board with piece images
+* Add AI opponent
+* Add AI chat helper / tutor
 
 ---
 
-### 📄 License
+## ✅ Requirements
 
-This project is open source and licensed under the MIT License.
+* Python 3.8+
+* Node.js 16+
+
+---
+
+## 📄 License
+
+Licensed under the MIT License.
 
 ---
