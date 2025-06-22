@@ -1,4 +1,6 @@
 from typing import Dict, Tuple
+import sys
+
 
 # Define types for clarity
 Position = str  # e.g. 'e4'
@@ -8,6 +10,15 @@ class ChessGame:
     def __init__(self):
         self.board: Dict[Position, Piece] = self._initial_board()
         self.turn = 'white'  # 'white' or 'black'
+        self.game_over = False
+    
+    def _piece_name(self, symbol: str) -> str:
+        names = {
+            'p': 'pawn', 'r': 'rook', 'n': 'knight',
+            'b': 'bishop', 'q': 'queen', 'k': 'king'
+        }
+        return names.get(symbol.lower(), 'piece')
+
 
     def _initial_board(self) -> Dict[Position, Piece]:
         # Setup pieces with uppercase for White, lowercase for Black
@@ -49,6 +60,19 @@ class ChessGame:
             return 'none'
         return 'white' if piece.isupper() else 'black'
 
+    def check_game_over(self):
+        # Check for presence of kings
+        pieces = self.board.values()
+        has_white_king = 'K' in pieces
+        has_black_king = 'k' in pieces
+
+        if not has_white_king:
+            print("Black wins! White's king is missing.")
+            self.game_over = True
+        elif not has_black_king:
+            print("White wins! Black's king is missing.")
+            self.game_over = True
+
     def make_move(self, from_pos: Position, to_pos: Position) -> bool:
         # Basic validation: positions valid
         if not (self.is_valid_pos(from_pos) and self.is_valid_pos(to_pos)):
@@ -71,12 +95,22 @@ class ChessGame:
             print("Illegal move for piece.")
             return False
 
-        # Move piece
+        # Capture announcement
+        if target_piece != '.':
+            color = 'white' if target_piece.isupper() else 'black'
+            piece_name = self._piece_name(target_piece)
+            print(f"{self.turn.capitalize()} captures {color} {piece_name} on {to_pos}!")
+
+        # Execute move
         self.board[to_pos] = piece
         self.board[from_pos] = '.'
-        # Switch turn
-        self.turn = 'black' if self.turn == 'white' else 'white'
+
+        self.check_game_over()
+        if not self.game_over:
+            # Switch turn
+            self.turn = 'black' if self.turn == 'white' else 'white'
         return True
+
 
     def is_legal_move(self, piece: Piece, from_pos: Position, to_pos: Position) -> bool:
         # Define movement rules for each piece type (no castling, no en passant, no promotion)
@@ -156,10 +190,17 @@ class ChessGame:
             current_file += step_file
             current_rank += step_rank
         return True
+    
+    def remove_piece(self, symbol: str):
+        for pos, piece in self.board.items():
+            if piece == symbol:
+                self.board[pos] = '.'
+                break
+
 
     def run(self):
         print("Welcome to Simple Chess!")
-        while True:
+        while not self.game_over:
             self.print_board()
             print(f"{self.turn.capitalize()}'s move (e.g. e2 e4): ", end='')
             move = input().strip().lower().split()
@@ -170,11 +211,17 @@ class ChessGame:
                 print("Invalid input. Enter source and destination like: e2 e4")
                 continue
             from_pos, to_pos = move
-            if self.make_move(from_pos, to_pos):
-                continue  # Successful move
-            else:
-                print("Try again.")
+            self.make_move(from_pos, to_pos)
+
+        print("Final board:")
+        self.print_board()
+        print("Game over.")
+
 
 if __name__ == "__main__":
-    game = ChessGame()
-    game.run()
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        import unittest
+        unittest.main(module="test_chess", argv=sys.argv[:1])  # avoid passing test as test name
+    else:
+        game = ChessGame()
+        game.run()
