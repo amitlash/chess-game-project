@@ -1,6 +1,6 @@
 # test_chess.py
 import unittest
-from groq_testing.chess_game.backend.core.chessboard import ChessGame
+from groq_testing.chess_game.backend.core.game_engine import ChessGame
 
 class TestChessGame(unittest.TestCase):
     def setUp(self):
