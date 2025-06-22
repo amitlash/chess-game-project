@@ -8,14 +8,27 @@ logger = logging.getLogger(__name__)
 
 
 class ChessGame:
+    """
+    A class to manage the state and rules of a chess game.
+    Provides methods to make moves, validate legality, and detect game-over conditions.
+    """
+
     def __init__(self):
+        """
+        Initialize the chess game with the starting board, white's turn, and game not over.
+        """
         self.board: Dict[Position, Piece] = self._initial_board()
         self.turn = 'white'
         self.game_over = False
         logger.info("ChessGame initialized.")
 
     def _initial_board(self) -> Dict[Position, Piece]:
-        # Setup pieces with uppercase for White, lowercase for Black
+        """
+        Create and return the initial board layout for a new chess game.
+
+        Returns:
+            Dict[Position, Piece]: A mapping of positions to pieces.
+        """
         pieces = {
             'a1': 'R', 'b1': 'N', 'c1': 'B', 'd1': 'Q', 'e1': 'K', 'f1': 'B', 'g1': 'N', 'h1': 'R',
             'a2': 'P', 'b2': 'P', 'c2': 'P', 'd2': 'P', 'e2': 'P', 'f2': 'P', 'g2': 'P', 'h2': 'P',
@@ -31,26 +44,75 @@ class ChessGame:
         return board
 
     def is_valid_pos(self, pos: Position) -> bool:
+        """
+        Check whether a position is valid on a chess board.
+
+        Args:
+            pos (Position): Position string, e.g., 'e4'.
+
+        Returns:
+            bool: True if the position is valid, False otherwise.
+        """
         return len(pos) == 2 and pos[0] in 'abcdefgh' and pos[1] in '12345678'
 
     def is_white_piece(self, piece: Piece) -> bool:
+        """
+        Check if a piece belongs to White.
+
+        Args:
+            piece (Piece): Piece character.
+
+        Returns:
+            bool: True if white, False otherwise.
+        """
         return piece.isupper() and piece != '.'
 
     def is_black_piece(self, piece: Piece) -> bool:
+        """
+        Check if a piece belongs to Black.
+
+        Args:
+            piece (Piece): Piece character.
+
+        Returns:
+            bool: True if black, False otherwise.
+        """
         return piece.islower() and piece != '.'
 
     def get_piece_color(self, piece: Piece) -> str:
+        """
+        Return the color of the piece.
+
+        Args:
+            piece (Piece): Piece character.
+
+        Returns:
+            str: 'white', 'black', or 'none'.
+        """
         if piece == '.':
             return 'none'
         return 'white' if self.is_white_piece(piece) else 'black'
 
     def _piece_name(self, symbol: str) -> str:
+        """
+        Convert a piece symbol to a human-readable name.
+
+        Args:
+            symbol (str): Piece character.
+
+        Returns:
+            str: Name of the piece.
+        """
         return {
             'p': 'pawn', 'r': 'rook', 'n': 'knight',
             'b': 'bishop', 'q': 'queen', 'k': 'king'
         }.get(symbol.lower(), 'piece')
 
     def check_game_over(self):
+        """
+        Check if either king is missing and set the game_over flag if so.
+        Logs the result.
+        """
         pieces = self.board.values()
         has_white_king = 'K' in pieces
         has_black_king = 'k' in pieces
@@ -63,6 +125,16 @@ class ChessGame:
             self.game_over = True
 
     def make_move(self, from_pos: Position, to_pos: Position) -> bool:
+        """
+        Attempt to move a piece from one position to another.
+
+        Args:
+            from_pos (Position): Source square.
+            to_pos (Position): Destination square.
+
+        Returns:
+            bool: True if move is legal and executed, False otherwise.
+        """
         logger.debug(f"Attempting move from {from_pos} to {to_pos} by {self.turn}.")
         if not (self.is_valid_pos(from_pos) and self.is_valid_pos(to_pos)):
             logger.warning("Invalid board position.")
@@ -87,7 +159,8 @@ class ChessGame:
             return False
 
         if target_piece != '.':
-            logger.info(f"{self.turn.capitalize()} {self._piece_name(piece)} captures {self.get_piece_color(target_piece)} {self._piece_name(target_piece)} on {to_pos}.")
+            logger.info(f"{self.turn.capitalize()} {self._piece_name(piece)} captures "
+                        f"{self.get_piece_color(target_piece)} {self._piece_name(target_piece)} on {to_pos}.")
 
         self.board[to_pos] = piece
         self.board[from_pos] = '.'
@@ -100,7 +173,17 @@ class ChessGame:
         return True
 
     def is_legal_move(self, piece: Piece, from_pos: Position, to_pos: Position) -> bool:
-        # Define movement rules for each piece type (no castling, no en passant, no promotion)
+        """
+        Determine whether a move is legal for the specified piece.
+
+        Args:
+            piece (Piece): Piece to move.
+            from_pos (Position): Starting square.
+            to_pos (Position): Destination square.
+
+        Returns:
+            bool: True if the move is legal, False otherwise.
+        """
         df = ord(to_pos[0]) - ord(from_pos[0])
         dr = int(to_pos[1]) - int(from_pos[1])
 
@@ -119,6 +202,19 @@ class ChessGame:
         return False
 
     def _legal_pawn_move(self, piece: Piece, from_pos: Position, to_pos: Position, df: int, dr: int) -> bool:
+        """
+        Check whether a pawn move is legal.
+
+        Args:
+            piece (Piece): The pawn.
+            from_pos (Position): Start square.
+            to_pos (Position): Target square.
+            df (int): File delta.
+            dr (int): Rank delta.
+
+        Returns:
+            bool: True if pawn move is legal, else False.
+        """
         direction = 1 if piece.isupper() else -1
         start_rank = '2' if piece.isupper() else '7'
         target = self.board[to_pos]
@@ -134,7 +230,16 @@ class ChessGame:
         return False
 
     def _is_path_clear(self, from_pos: Position, to_pos: Position) -> bool:
-        # Checks if path is clear between from_pos and to_pos for sliding pieces
+        """
+        Check whether all squares between two positions are empty (for sliding pieces).
+
+        Args:
+            from_pos (Position): Start square.
+            to_pos (Position): End square.
+
+        Returns:
+            bool: True if path is clear, else False.
+        """
         df = ord(to_pos[0]) - ord(from_pos[0])
         dr = int(to_pos[1]) - int(from_pos[1])
         step_f = (df > 0) - (df < 0)
@@ -150,6 +255,13 @@ class ChessGame:
         return True
 
     def remove_piece(self, symbol: str):
+        """
+        Remove the first occurrence of a piece with the given symbol from the board.
+        Used in test - not in game.
+
+        Args:
+            symbol (str): Character representing the piece to remove.
+        """
         for pos, piece in self.board.items():
             if piece == symbol:
                 self.board[pos] = '.'
