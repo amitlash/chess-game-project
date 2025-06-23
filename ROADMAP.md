@@ -56,6 +56,12 @@ For each feature/change:
    ```
 5. Delete feature branch after merge (optional)
 
+### Branch Synchronization Checklist
+Before starting a new feature branch from dev, always ask:
+- Do I need to merge another feature branch into dev to ensure all required changes are present?
+- Is dev up to date with all completed or in-progress features that my new work will depend on?
+- If not, merge the necessary branches into dev and resolve any conflicts before branching.
+
 ## 🎯 Project Phases
 
 ### Phase 1: Backend Enhancement
