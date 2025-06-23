@@ -40,3 +40,43 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Chess game specific styles */
+.chess-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.chess-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.reset-button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+  background-color: #45a049;
+}
+
+.reset-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}

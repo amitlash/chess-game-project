@@ -35,7 +35,6 @@ function getInitialBoard(): Board {
 }
 
 function backendBoardToFrontend(board: Record<string, string>): Board {
-  // board: { e2: 'P', ... } => Board (8x8 array)
   const files = 'abcdefgh';
   const ranks = '87654321';
   return ranks.split('').map((rank) =>

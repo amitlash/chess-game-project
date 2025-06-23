@@ -1,17 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Chessboard from './components/Chessboard'
-import MoveHistory from './components/MoveHistory'
+import { useChessStore } from './store';
+import Chessboard from './components/Chessboard';
+import MoveHistory from './components/MoveHistory';
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const sendReset = useChessStore((state) => state.sendReset);
+  const loading = useChessStore((state) => state.loading);
+  
   return (
-    <div>
+    <div className="chess-game">
       <h1>Chess Game</h1>
-      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
+      <div className="chess-controls">
+        <button 
+          className="reset-button" 
+          onClick={sendReset}
+          disabled={loading}
+        >
+          Reset Game
+        </button>
+      </div>
+      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', alignItems: 'flex-start' }}>
         <Chessboard />
         <MoveHistory />
       </div>
@@ -19,4 +26,4 @@ function App() {
   )
 }
 
-export default App
+export default App; 
