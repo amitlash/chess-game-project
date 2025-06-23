@@ -1,25 +1,23 @@
 import React from 'react';
 
-const unicodePieces: Record<string, { white: string; black: string }> = {
-  K: { white: '♔', black: '♚' },
-  Q: { white: '♕', black: '♛' },
-  R: { white: '♖', black: '♜' },
-  B: { white: '♗', black: '♝' },
-  N: { white: '♘', black: '♞' },
-  P: { white: '♙', black: '♟' },
-};
-
 interface PieceProps {
   type: 'K' | 'Q' | 'R' | 'B' | 'N' | 'P';
   color: 'white' | 'black';
 }
 
+const pieceToFile = {
+  K: { white: 'wK.svg', black: 'bK.svg' },
+  Q: { white: 'wQ.svg', black: 'bQ.svg' },
+  R: { white: 'wR.svg', black: 'bR.svg' },
+  B: { white: 'wB.svg', black: 'bB.svg' },
+  N: { white: 'wN.svg', black: 'bN.svg' },
+  P: { white: 'wP.svg', black: 'bP.svg' },
+};
+
 const Piece: React.FC<PieceProps> = ({ type, color }) => {
-  return (
-    <span style={{ color: color === 'white' ? '#fff' : '#222', textShadow: color === 'white' ? '0 0 2px #000' : '0 0 2px #fff' }}>
-      {unicodePieces[type][color]}
-    </span>
-  );
+  const fileName = pieceToFile[type][color];
+  const src = new URL(`../assets/pieces/${fileName}`, import.meta.url).href;
+  return <img src={src} alt={`${color} ${type}`} style={{ width: 40, height: 40 }} draggable={false} />;
 };
 
 export default Piece; 
