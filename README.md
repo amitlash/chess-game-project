@@ -28,13 +28,12 @@ A fullstack Python & React chess web application. Built with a FastAPI backend s
   * Resetting the game
 * Logging and error handling
 * Modular structure for scalability
-* Unit-tested with `unittest` and `TestClient`
+* Unit-tested with `pytest` and `TestClient`
 
 ### 💻 Frontend (React)
 
-* Calls backend APIs to display and update game state
-* Organized with modular components and API service file
-* React + Vite setup
+* API service file for backend communication (`src/services/api.js`)
+* (UI components not yet implemented)
 
 ---
 
@@ -50,7 +49,7 @@ A fullstack Python & React chess web application. Built with a FastAPI backend s
 ## 📁 Project Structure
 
 ```
-my-chess-app/
+chess_game/
 ├── backend/
 │   ├── app/
 │   │   ├── api/
@@ -62,17 +61,11 @@ my-chess-app/
 │   │       ├── __init__.py
 │   │       ├── test_game_engine.py # Unit tests for core logic
 │   │       └── test_api.py         # Unit tests for API
-│   └── requirements.txt
+│   └── requirements.txt            # Backend dependencies
 │
-├── frontend/                       # Not yet implemented
+├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/api.js         # Frontend API calls to backend
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── package.json
-│   └── vite.config.js
+│   │   └── services/api.js         # Frontend API calls to backend
 │
 ├── README.md
 └── run_all.sh                      # Optional: run frontend & backend together
@@ -104,7 +97,7 @@ uvicorn main:app --reload
 
 ### 🌐 Frontend (React)
 
-*Not yet implemented.*
+*Not yet implemented beyond API service.*
 
 #### Install dependencies:
 
@@ -123,22 +116,33 @@ npm run dev
 
 ### 📬 API Endpoints
 
-* `GET /api/board` — fetch current board and state
-* `POST /api/move` — submit a move `{ from_pos, to_pos }`
-* `POST /api/reset` — reset the game to initial state
+* `GET /board` — fetch current board and state
+* `POST /move` — submit a move with JSON body: `{ "from_pos": "e2", "to_pos": "e4" }`
+* `POST /reset` — reset the game to initial state
 
 ---
 
 ## 🧪 Run Tests
 
-### Backend Unit Tests:
+### Backend Unit & API Tests (Recommended: pytest):
 
 ```bash
 cd backend/app
-python -m unittest discover
+pytest
 ```
 
-(Or use `pytest`)
+Or run a specific test file:
+
+```bash
+pytest tests/test_game_engine.py
+pytest tests/test_api.py
+```
+
+> **Note:**
+> - Run tests from the `backend/app` directory. The test imports expect this as the working directory.
+> - If you see `ModuleNotFoundError: No module named 'app'` or `No module named 'core'`, check your working directory and ensure you are running the test commands from `backend/app`.
+> - For API tests, the `/move` endpoint expects a JSON body: `{ "from_pos": "e2", "to_pos": "e4" }`.
+> - If `pytest` is not installed, run `pip install pytest` inside your virtual environment.
 
 ---
 
