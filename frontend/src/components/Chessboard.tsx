@@ -27,6 +27,12 @@ const Chessboard: React.FC = () => {
       {initialBoard.map((row, rowIdx) =>
         row.map((piece, colIdx) => {
           const isLight = (rowIdx + colIdx) % 2 === 1;
+          let color: 'white' | 'black' | undefined;
+          let type: 'K' | 'Q' | 'R' | 'B' | 'N' | 'P' | undefined;
+          if (piece) {
+            color = piece[0] === 'w' ? 'white' : 'black';
+            type = piece[1] as 'K' | 'Q' | 'R' | 'B' | 'N' | 'P';
+          }
           return (
             <div
               key={`${rowIdx}-${colIdx}`}
@@ -40,8 +46,8 @@ const Chessboard: React.FC = () => {
                 fontSize: 32,
               }}
             >
-              {piece ? (
-                <Piece type={piece[1]} color={piece[0] === 'w' ? 'white' : 'black'} />
+              {piece && color && type ? (
+                <Piece type={type} color={color} />
               ) : null}
             </div>
           );

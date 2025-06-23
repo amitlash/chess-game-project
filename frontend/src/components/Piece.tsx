@@ -15,7 +15,11 @@ interface PieceProps {
 }
 
 const Piece: React.FC<PieceProps> = ({ type, color }) => {
-  return <span>{unicodePieces[type][color]}</span>;
+  return (
+    <span style={{ color: color === 'white' ? '#fff' : '#222', textShadow: color === 'white' ? '0 0 2px #000' : '0 0 2px #fff' }}>
+      {unicodePieces[type][color]}
+    </span>
+  );
 };
 
 export default Piece; 
