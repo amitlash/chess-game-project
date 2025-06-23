@@ -1,18 +1,9 @@
 import React from 'react';
 import Piece from './Piece';
-
-const initialBoard = [
-  ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'],
-  ['bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP'],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  ['wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP'],
-  ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR'],
-];
+import { useChessStore } from '../store';
 
 const Chessboard: React.FC = () => {
+  const board = useChessStore((state) => state.board);
   return (
     <div
       style={{
@@ -24,15 +15,9 @@ const Chessboard: React.FC = () => {
         border: '2px solid #333',
       }}
     >
-      {initialBoard.map((row, rowIdx) =>
+      {board.map((row, rowIdx) =>
         row.map((piece, colIdx) => {
           const isLight = (rowIdx + colIdx) % 2 === 1;
-          let color: 'white' | 'black' | undefined;
-          let type: 'K' | 'Q' | 'R' | 'B' | 'N' | 'P' | undefined;
-          if (piece) {
-            color = piece[0] === 'w' ? 'white' : 'black';
-            type = piece[1] as 'K' | 'Q' | 'R' | 'B' | 'N' | 'P';
-          }
           return (
             <div
               key={`${rowIdx}-${colIdx}`}
@@ -46,9 +31,7 @@ const Chessboard: React.FC = () => {
                 fontSize: 32,
               }}
             >
-              {piece && color && type ? (
-                <Piece type={type} color={color} />
-              ) : null}
+              {piece ? <Piece type={piece.type} color={piece.color} /> : null}
             </div>
           );
         })
