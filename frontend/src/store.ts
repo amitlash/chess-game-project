@@ -37,7 +37,9 @@ export interface ChessState {
   board: Board;
   moveHistory: string[];
   turn: PieceColor;
-  makeMove: (from: [number, number], to: [number, number]) => void;
+  selectedSquare: [number, number] | null;
+  selectSquare: (square: [number, number] | null) => void;
+  movePiece: (to: [number, number]) => void;
   reset: () => void;
 }
 
@@ -45,15 +47,28 @@ export const useChessStore = create<ChessState>((set, get) => ({
   board: getInitialBoard(),
   moveHistory: [],
   turn: 'white',
-  makeMove: (from, to) => {
-    // Placeholder: just add a move to history for now
-    set((state) => ({
+  selectedSquare: null,
+  selectSquare: (square) => set({ selectedSquare: square }),
+  movePiece: (to) => {
+    const { selectedSquare, board, turn, moveHistory } = get();
+    if (!selectedSquare) return;
+    const [fromRow, fromCol] = selectedSquare;
+    const [toRow, toCol] = to;
+    const piece = board[fromRow][fromCol];
+    if (!piece || piece.color !== turn) return;
+    // For now, allow any move (no validation)
+    const newBoard = board.map((row) => row.slice());
+    newBoard[toRow][toCol] = piece;
+    newBoard[fromRow][fromCol] = null;
+    set({
+      board: newBoard,
       moveHistory: [
-        ...state.moveHistory,
-        `(${from[0]},${from[1]}) → (${to[0]},${to[1]})`,
+        ...moveHistory,
+        `${piece.color} ${piece.type}: (${fromRow},${fromCol}) → (${toRow},${toCol})`,
       ],
-      turn: state.turn === 'white' ? 'black' : 'white',
-    }));
+      turn: turn === 'white' ? 'black' : 'white',
+      selectedSquare: null,
+    });
   },
-  reset: () => set({ board: getInitialBoard(), moveHistory: [], turn: 'white' }),
+  reset: () => set({ board: getInitialBoard(), moveHistory: [], turn: 'white', selectedSquare: null }),
 })); 
