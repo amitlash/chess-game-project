@@ -1,18 +1,25 @@
 import React from 'react';
 import Piece from './Piece';
-
-const initialBoard = [
-  ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'],
-  ['bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP'],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  ['wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP'],
-  ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR'],
-];
+import { useChessStore } from '../store';
 
 const Chessboard: React.FC = () => {
+  const board = useChessStore((state) => state.board);
+  const selectedSquare = useChessStore((state) => state.selectedSquare);
+  const selectSquare = useChessStore((state) => state.selectSquare);
+  const movePiece = useChessStore((state) => state.movePiece);
+
+  function handleSquareClick(rowIdx: number, colIdx: number) {
+    if (selectedSquare) {
+      if (selectedSquare[0] === rowIdx && selectedSquare[1] === colIdx) {
+        selectSquare(null); // Deselect if clicking the same square
+      } else {
+        movePiece([rowIdx, colIdx]);
+      }
+    } else if (board[rowIdx][colIdx]) {
+      selectSquare([rowIdx, colIdx]);
+    }
+  }
+
   return (
     <div
       style={{
@@ -24,31 +31,32 @@ const Chessboard: React.FC = () => {
         border: '2px solid #333',
       }}
     >
-      {initialBoard.map((row, rowIdx) =>
+      {board.map((row, rowIdx) =>
         row.map((piece, colIdx) => {
           const isLight = (rowIdx + colIdx) % 2 === 1;
-          let color: 'white' | 'black' | undefined;
-          let type: 'K' | 'Q' | 'R' | 'B' | 'N' | 'P' | undefined;
-          if (piece) {
-            color = piece[0] === 'w' ? 'white' : 'black';
-            type = piece[1] as 'K' | 'Q' | 'R' | 'B' | 'N' | 'P';
-          }
+          const isSelected = selectedSquare && selectedSquare[0] === rowIdx && selectedSquare[1] === colIdx;
           return (
             <div
               key={`${rowIdx}-${colIdx}`}
+              onClick={() => handleSquareClick(rowIdx, colIdx)}
               style={{
-                background: isLight ? '#f0d9b5' : '#b58863',
+                background: isSelected
+                  ? '#ff0'
+                  : isLight
+                  ? '#f0d9b5'
+                  : '#b58863',
                 width: '100%',
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: 32,
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+                border: isSelected ? '2px solid #f90' : undefined,
               }}
             >
-              {piece && color && type ? (
-                <Piece type={type} color={color} />
-              ) : null}
+              {piece ? <Piece type={piece.type} color={piece.color} /> : null}
             </div>
           );
         })
