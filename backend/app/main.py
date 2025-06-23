@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.routes import router as chess_router
+from app.api.routes import router as chess_router
 import logging
 
 logging.basicConfig(

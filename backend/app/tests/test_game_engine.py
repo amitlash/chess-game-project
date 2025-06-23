@@ -1,5 +1,5 @@
 import unittest
-from core.game_engine import ChessGame
+from app.core.game_engine import ChessGame
 
 class TestChessGame(unittest.TestCase):
     """Unit tests for the ChessGame logic engine."""

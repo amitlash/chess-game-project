@@ -1,6 +1,6 @@
 import logging
 from fastapi import APIRouter
-from core.game_engine import ChessGame
+from app.core.game_engine import ChessGame
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -14,6 +14,11 @@ API routes for the chess backend.
 - /move: POST a move (expects JSON body: {"from_pos": ..., "to_pos": ...})
 - /reset: POST to reset the game
 """
+
+
+@router.get("/")
+def read_root():
+    return {"message": "Welcome to the API!"}
 
 class MoveRequest(BaseModel):
     from_pos: str
