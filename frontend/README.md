@@ -52,3 +52,15 @@ export default tseslint.config({
   },
 })
 ```
+
+## Linting and Formatting
+
+This project uses **ESLint** and **Prettier** for code quality and formatting.
+
+### Lint
+- Run `npm run lint` to check for lint errors.
+- Run `npm run lint:fix` to automatically fix lint errors.
+
+### Format
+- Run `npm run format` to format all files with Prettier.
+- Run `npm run format:check` to check formatting without making changes.
