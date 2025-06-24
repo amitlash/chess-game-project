@@ -1,5 +1,5 @@
 import logging
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.core.game_engine import ChessGame
 from pydantic import BaseModel
 
@@ -51,7 +51,13 @@ def make_move(move: MoveRequest):
     Returns:
         dict: Result of the move attempt including success status,
               updated board, current turn, and game_over flag.
+    
+    Raises:
+        HTTPException: 409 error if the game is already over.
     """
+    if game.game_over:
+        raise HTTPException(status_code=409, detail="Game is over. No more moves allowed.")
+
     logger.info(f"Move request: {move.from_pos} to {move.to_pos} by {game.turn}.")
     success = game.make_move(move.from_pos, move.to_pos)
     logger.debug(f"Move success: {success}")
