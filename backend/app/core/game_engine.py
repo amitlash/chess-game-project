@@ -135,6 +135,10 @@ class ChessGame:
         Returns:
             bool: True if move is legal and executed, False otherwise.
         """
+        if self.game_over:
+            logger.warning("Attempted to make a move, but the game is over.")
+            return False
+
         logger.debug(f"Attempting move from {from_pos} to {to_pos} by {self.turn} (moving piece: {self.board[from_pos]} [{self.get_piece_color(self.board[from_pos])}]).")
         if not (self.is_valid_pos(from_pos) and self.is_valid_pos(to_pos)):
             logger.warning(f"Invalid board position: from {from_pos} to {to_pos}.")

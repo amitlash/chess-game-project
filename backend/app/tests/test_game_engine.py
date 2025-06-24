@@ -66,6 +66,23 @@ class TestChessGame(unittest.TestCase):
         self.game.board['e3'] = 'x'
         self.assertFalse(self.game.make_move('e2', 'e4'))
 
+    def test_cannot_move_after_game_over(self):
+        """Test that no more moves can be made once the game is over."""
+        # Set up a scenario where white can capture the black king
+        self.game.board = {pos: '.' for pos in self.game.board}
+        self.game.board['e8'] = 'k'  # Black King
+        self.game.board['e1'] = 'K'  # White King
+        self.game.board['d8'] = 'Q'  # White Queen
+        self.game.turn = 'white'
+
+        # White captures the black king, ending the game
+        self.assertTrue(self.game.make_move('d8', 'e8'))
+        self.assertTrue(self.game.game_over)
+
+        # Attempt another move with white (the winning color)
+        self.game.board['a1'] = 'R' # Add a rook to move
+        self.assertFalse(self.game.make_move('a1', 'a2'), "Should not be able to move after game is over.")
+
 
 if __name__ == "__main__":
     unittest.main()
