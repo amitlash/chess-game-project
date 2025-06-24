@@ -1,3 +1,4 @@
+import './App.css';
 import { useChessStore } from './store';
 import Chessboard from './components/Chessboard';
 import MoveHistory from './components/MoveHistory';
