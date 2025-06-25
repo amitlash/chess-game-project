@@ -10,6 +10,8 @@ const Chessboard: React.FC = () => {
   const fetchBoard = useChessStore((state) => state.fetchBoard);
   const loading = useChessStore((state) => state.loading);
   const error = useChessStore((state) => state.error);
+  const gameOver = useChessStore((state) => state.gameOver);
+  const turn = useChessStore((state) => state.turn);
 
   useEffect(() => {
     fetchBoard();
@@ -17,7 +19,7 @@ const Chessboard: React.FC = () => {
   }, []);
 
   async function handleSquareClick(rowIdx: number, colIdx: number) {
-    if (loading) return;
+    if (loading || gameOver) return;
     if (selectedSquare) {
       if (selectedSquare[0] === rowIdx && selectedSquare[1] === colIdx) {
         selectSquare(null); // Deselect if clicking the same square
@@ -31,9 +33,32 @@ const Chessboard: React.FC = () => {
   }
 
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
       {loading && <div style={{ color: 'orange', marginBottom: 8 }}>Loading...</div>}
       {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
+      {gameOver && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 10,
+          fontSize: '2rem',
+          fontWeight: 'bold',
+        }}>
+          <div>Game Over</div>
+          <div style={{ fontSize: '1.2rem', marginTop: '0.5rem' }}>
+            {turn === 'white' ? 'Black' : 'White'} wins!
+          </div>
+        </div>
+      )}
       <div
         style={{
           display: 'grid',
@@ -42,6 +67,7 @@ const Chessboard: React.FC = () => {
           width: 400,
           height: 400,
           border: '2px solid #333',
+          opacity: gameOver ? 0.6 : 1,
         }}
       >
         {board.map((row, rowIdx) =>
@@ -64,7 +90,7 @@ const Chessboard: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 32,
-                  cursor: loading ? 'not-allowed' : 'pointer',
+                  cursor: loading || gameOver ? 'not-allowed' : 'pointer',
                   boxSizing: 'border-box',
                   border: isSelected ? '2px solid #f90' : undefined,
                   opacity: loading ? 0.5 : 1,
