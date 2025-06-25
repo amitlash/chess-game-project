@@ -118,10 +118,10 @@ class ChessGame:
         has_black_king = 'k' in pieces
 
         if not has_white_king:
-            logger.info("Black wins — White's king is missing.")
+            logger.info("Game over: Black wins — White's king is missing from the board.")
             self.game_over = True
         elif not has_black_king:
-            logger.info("White wins — Black's king is missing.")
+            logger.info("Game over: White wins — Black's king is missing from the board.")
             self.game_over = True
 
     def make_move(self, from_pos: Position, to_pos: Position) -> bool:
@@ -135,32 +135,31 @@ class ChessGame:
         Returns:
             bool: True if move is legal and executed, False otherwise.
         """
-        logger.debug(f"Attempting move from {from_pos} to {to_pos} by {self.turn}.")
+        logger.debug(f"Attempting move from {from_pos} to {to_pos} by {self.turn} (moving piece: {self.board[from_pos]} [{self.get_piece_color(self.board[from_pos])}]).")
         if not (self.is_valid_pos(from_pos) and self.is_valid_pos(to_pos)):
-            logger.warning("Invalid board position.")
+            logger.warning(f"Invalid board position: from {from_pos} to {to_pos}.")
             return False
 
         piece = self.board[from_pos]
         if piece == '.':
-            logger.warning("No piece at source position.")
+            logger.warning(f"No piece at source position {from_pos}.")
             return False
 
         if self.get_piece_color(piece) != self.turn:
-            logger.warning(f"It's {self.turn}'s turn, but tried to move {piece}.")
+            logger.warning(f"It's {self.turn}'s turn, but tried to move {piece} ({self.get_piece_color(piece)}) from {from_pos}.")
             return False
 
         target_piece = self.board[to_pos]
         if self.get_piece_color(target_piece) == self.turn:
-            logger.warning("Cannot capture your own piece.")
+            logger.warning(f"Invalid move: Cannot capture your own piece ({target_piece}) at {to_pos}.")
             return False
 
         if not self.is_legal_move(piece, from_pos, to_pos):
-            logger.warning("Illegal move attempted.")
+            logger.warning(f"Illegal move attempted: {piece} ({self.get_piece_color(piece)}) from {from_pos} to {to_pos}.")
             return False
 
         if target_piece != '.':
-            logger.info(f"{self.turn.capitalize()} {self._piece_name(piece)} captures "
-                        f"{self.get_piece_color(target_piece)} {self._piece_name(target_piece)} on {to_pos}.")
+            logger.info(f"{self.turn.capitalize()} {self._piece_name(piece)} ({piece}) captures {self.get_piece_color(target_piece)} {self._piece_name(target_piece)} ({target_piece}) on {to_pos}.")
 
         self.board[to_pos] = piece
         self.board[from_pos] = '.'
