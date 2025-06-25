@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Piece from './Piece';
 import { useChessStore } from '../store';
 
@@ -12,6 +12,20 @@ const Chessboard: React.FC = () => {
   const error = useChessStore((state) => state.error);
   const gameOver = useChessStore((state) => state.gameOver);
   const turn = useChessStore((state) => state.turn);
+
+  // Add delayed loading state for opacity
+  const [delayedLoading, setDelayedLoading] = useState(false);
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    if (loading) {
+      timeout = setTimeout(() => setDelayedLoading(true), 400);
+    } else {
+      setDelayedLoading(false);
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [loading]);
 
   useEffect(() => {
     fetchBoard();
@@ -34,8 +48,6 @@ const Chessboard: React.FC = () => {
 
   return (
     <div style={{ position: 'relative' }}>
-      {loading && <div style={{ color: 'orange', marginBottom: 8 }}>Loading...</div>}
-      {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
       {gameOver && (
         <div style={{
           position: 'absolute',
@@ -67,7 +79,7 @@ const Chessboard: React.FC = () => {
           width: 400,
           height: 400,
           border: '2px solid #333',
-          opacity: gameOver ? 0.6 : 1,
+          opacity: gameOver ? 0.6 : delayedLoading ? 0.5 : 1,
         }}
       >
         {board.map((row, rowIdx) =>
@@ -93,7 +105,7 @@ const Chessboard: React.FC = () => {
                   cursor: loading || gameOver ? 'not-allowed' : 'pointer',
                   boxSizing: 'border-box',
                   border: isSelected ? '2px solid #f90' : undefined,
-                  opacity: loading ? 0.5 : 1,
+                  opacity: delayedLoading ? 0.5 : 1,
                 }}
               >
                 {piece ? <Piece type={piece.type} color={piece.color} /> : null}
