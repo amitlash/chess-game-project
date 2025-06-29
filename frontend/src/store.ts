@@ -6,6 +6,18 @@ export type PieceColor = 'white' | 'black';
 export type Piece = { type: PieceType; color: PieceColor } | null;
 export type Board = Piece[][];
 
+// Move record type matching backend
+export interface MoveRecord {
+  from_pos: string;
+  to_pos: string;
+  piece: string;
+  color: PieceColor;
+  captured_piece?: string | null;
+  is_capture: boolean;
+  algebraic_notation: string;
+  turn_number: number;
+}
+
 function getInitialBoard(): Board {
   return [
     [
@@ -50,7 +62,7 @@ function backendBoardToFrontend(board: Record<string, string>): Board {
 
 export interface ChessState {
   board: Board;
-  moveHistory: string[];
+  moveHistory: MoveRecord[];
   turn: PieceColor;
   gameOver: boolean;
   selectedSquare: [number, number] | null;
@@ -80,6 +92,7 @@ export const useChessStore = create<ChessState>((set, get) => ({
         board: backendBoardToFrontend(data.board),
         turn: data.turn === 'white' ? 'white' : 'black',
         gameOver: data.game_over,
+        moveHistory: data.move_history || [],
         loading: false,
         error: null,
       });
@@ -103,6 +116,7 @@ export const useChessStore = create<ChessState>((set, get) => ({
         board: backendBoardToFrontend(data.board),
         turn: data.turn === 'white' ? 'white' : 'black',
         gameOver: data.game_over,
+        moveHistory: data.move_history || [],
         loading: false,
         error: null,
       });
@@ -113,7 +127,8 @@ export const useChessStore = create<ChessState>((set, get) => ({
   sendReset: async () => {
     set({ loading: true, error: null });
     try {
-      await api.resetGame();
+      const data = await api.resetGame();
+      set({ moveHistory: data.move_history || [] });
       await get().fetchBoard();
     } catch (e: any) {
       set({ loading: false, error: e.message || 'Failed to reset game' });
