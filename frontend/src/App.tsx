@@ -1,35 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
+import { useChessStore } from './store';
+import Chessboard from './components/Chessboard';
+import MoveHistory from './components/MoveHistory';
+import React, { useEffect, useState } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const sendReset = useChessStore((state) => state.sendReset);
+  const loading = useChessStore((state) => state.loading);
+  const error = useChessStore((state) => state.error);
+  
+  // Add delayed loading state for the loading message
+  const [delayedLoading, setDelayedLoading] = useState(false);
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    if (loading) {
+      timeout = setTimeout(() => setDelayedLoading(true), 400);
+    } else {
+      setDelayedLoading(false);
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [loading]);
+  
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="chess-game" style={{ gap: 8, paddingTop: 12, paddingBottom: 0, minHeight: 'unset' }}>
+      <h1 style={{ marginBottom: 8, marginTop: 8 }}>Chess Game</h1>
+      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', alignItems: 'flex-start' }}>
+        <Chessboard />
+        <MoveHistory />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+      <div className="chess-controls" style={{ marginTop: 16, marginBottom: 0, justifyContent: 'center' }}>
+        <button 
+          className="reset-button" 
+          onClick={sendReset}
+          disabled={loading}
+        >
+          Reset Game
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      <div style={{ minHeight: 24, marginTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {delayedLoading && <span style={{ color: 'orange' }}>Loading...</span>}
+        {!loading && error && <span style={{ color: 'red' }}>{error}</span>}
+      </div>
+    </div>
   )
 }
 
-export default App
+export default App; 
