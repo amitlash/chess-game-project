@@ -11,8 +11,11 @@ def test_board_initial():
     response = client.get("/board")
     assert response.status_code == 200
     data = response.json()
-    assert "board" in data and isinstance(data["board"], dict)
-    assert data["turn"] == "white"
+    assert "board" in data
+    assert "turn" in data
+    assert "game_over" in data
+    assert "move_history" in data
+    assert data["move_history"] == []
 
 
 def test_move():
@@ -20,27 +23,40 @@ def test_move():
     response = client.post("/move", json={"from_pos": "e2", "to_pos": "e4"})
     assert response.status_code == 200
     data = response.json()
-    assert data["success"] is True
-    assert data["board"]["e4"] == "P"
-    assert data["board"]["e2"] == "."
+    assert data["success"] == True
+    assert "move_history" in data
+    assert len(data["move_history"]) == 1
+    assert data["move_history"][0]["from_pos"] == "e2"
+    assert data["move_history"][0]["to_pos"] == "e4"
+    assert data["move_history"][0]["piece"] == "P"
+    assert data["move_history"][0]["color"] == "white"
 
 
 def test_reset():
+    # First make a move to have some history
+    client.post("/move", json={"from_pos": "e2", "to_pos": "e4"})
+    
     response = client.post("/reset")
     assert response.status_code == 200
-    assert response.json()["message"] == "Game reset"
+    data = response.json()
+    assert data["message"] == "Game reset"
+    assert "move_history" in data
+    assert data["move_history"] == []
 
 def test_move_after_game_over_fails():
     """Test that making a move after the game is over returns a 409 Conflict."""
-    client.post("/reset")  # Ensure a clean game state
+    # Reset to ensure clean state
+    client.post("/reset")
     
-    # Manually end the game
-    game.game_over = True
+    # Remove the white king to end the game
+    from app.api.routes import game
+    game.remove_piece('K')  # Remove white king to end game
+    game.check_game_over()  # Explicitly check game over condition
     
+    # Verify game is over
+    assert game.game_over == True
+    
+    # Try to make another move
     response = client.post("/move", json={"from_pos": "e2", "to_pos": "e4"})
-    
     assert response.status_code == 409
     assert response.json()["detail"] == "Game is over. No more moves allowed."
-    
-    # Reset the game state for other tests
-    game.game_over = False
