@@ -11,57 +11,6 @@
 > - Reviewing code with attention to detail
 > - Building for maintainability and scalability"
 
-## 📝 Git Workflow
-
-### Initial Setup
-1. [ ] Create and switch to the appropriate development branch:
-   - For backend:
-     ```bash
-     git checkout -b dev/backend
-     ```
-   - For frontend:
-     ```bash
-     git checkout -b dev/frontend
-     ```
-
-### Feature Implementation Process
-For each feature/change:
-1. Create a feature branch from the relevant dev branch:
-   - For backend features:
-     ```bash
-     git checkout -b feat/backend/feature-name dev/backend
-     ```
-   - For frontend features:
-     ```bash
-     git checkout -b feat/frontend/feature-name dev/frontend
-     ```
-2. Make changes following TDD:
-   - Write tests first
-   - Implement feature
-   - Ensure tests pass
-3. Commit changes with semantic messages:
-   ```bash
-   git add .
-   git commit -m "feat(component): description
-   
-   - Detailed bullet points
-   - Of changes made
-   - And their impact"
-   ```
-4. Push and merge:
-   ```bash
-   git push origin feat/backend/feature-name  # or feat/frontend/feature-name
-   # Create PR to dev/backend or dev/frontend as appropriate
-   # Review, approve, merge
-   ```
-5. Delete feature branch after merge (optional)
-
-### Branch Synchronization Checklist
-Before starting a new feature branch from dev, always ask:
-- Do I need to merge another feature branch into dev to ensure all required changes are present?
-- Is dev up to date with all completed or in-progress features that my new work will depend on?
-- If not, merge the necessary branches into dev and resolve any conflicts before branching.
-
 ## 🎯 Project Phases
 
 ### Phase 1: Backend Enhancement
@@ -188,4 +137,6 @@ A feature is considered done when:
 
 ---
 
-*Note: This roadmap is a living document. Update it as the project evolves and new requirements are discovered.* 
+*Note: This roadmap is a living document. Update it as the project evolves and new requirements are discovered.*
+
+**📋 Git Workflow Reference:** See [GIT_WORKFLOW.md](./GIT_WORKFLOW.md) for detailed Git workflow and branching strategy. 
