@@ -52,6 +52,7 @@ export interface ChessState {
   board: Board;
   moveHistory: string[];
   turn: PieceColor;
+  gameOver: boolean;
   selectedSquare: [number, number] | null;
   loading: boolean;
   error: string | null;
@@ -67,6 +68,7 @@ export const useChessStore = create<ChessState>((set, get) => ({
   board: getInitialBoard(),
   moveHistory: [],
   turn: 'white',
+  gameOver: false,
   selectedSquare: null,
   loading: false,
   error: null,
@@ -77,6 +79,7 @@ export const useChessStore = create<ChessState>((set, get) => ({
       set({
         board: backendBoardToFrontend(data.board),
         turn: data.turn === 'white' ? 'white' : 'black',
+        gameOver: data.game_over,
         loading: false,
         error: null,
       });
@@ -85,6 +88,10 @@ export const useChessStore = create<ChessState>((set, get) => ({
     }
   },
   sendMove: async (from, to) => {
+    if (get().gameOver) {
+      console.warn('Attempted to move after game over.');
+      return;
+    }
     set({ loading: true, error: null });
     try {
       const files = 'abcdefgh';
@@ -95,6 +102,7 @@ export const useChessStore = create<ChessState>((set, get) => ({
       set({
         board: backendBoardToFrontend(data.board),
         turn: data.turn === 'white' ? 'white' : 'black',
+        gameOver: data.game_over,
         loading: false,
         error: null,
       });
@@ -107,7 +115,6 @@ export const useChessStore = create<ChessState>((set, get) => ({
     try {
       await api.resetGame();
       await get().fetchBoard();
-      set({ loading: false, error: null });
     } catch (e: any) {
       set({ loading: false, error: e.message || 'Failed to reset game' });
     }
@@ -116,5 +123,5 @@ export const useChessStore = create<ChessState>((set, get) => ({
   movePiece: (to) => {
     // This will be replaced by sendMove in the UI
   },
-  reset: () => set({ board: getInitialBoard(), moveHistory: [], turn: 'white', selectedSquare: null }),
+  reset: () => set({ board: getInitialBoard(), moveHistory: [], turn: 'white', selectedSquare: null, gameOver: false }),
 })); 
