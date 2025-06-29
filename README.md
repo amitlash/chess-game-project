@@ -1,48 +1,42 @@
-Here’s an **updated and professional `README.md`** tailored to the current state of your project — now a fullstack web app with a FastAPI backend and a React frontend:
+# ♟️ Chess Game Project
 
----
-
-# ♟️ Simple Chess Web App
-
-A fullstack Python & React chess web application. Built with a FastAPI backend serving a basic turn-based chess engine, and a React frontend for interactive play. This project emphasizes simplicity, modularity, and testable architecture.
+A **fullstack chess application** built with FastAPI backend and React TypeScript frontend. Features basic chess gameplay with modern development practices, testing, and automated quality gates.
 
 ---
 
 ## 🚀 Features
 
 ### 🧠 Chess Engine
-
-* Fully initialized 8x8 board with standard starting positions
-* Piece movement rules: pawn, rook, knight, bishop, queen, king
-* Turn-based logic with enforced player alternation
-* Capture announcements (via logs)
-* Game over when a king is missing
-* Structured and unit-tested game logic
+* **Basic chess logic** with all piece movement rules
+* **Turn-based gameplay** with enforced player alternation
+* **Move history tracking** with algebraic notation
+* **Game over detection** (when a king is captured)
+* **Move validation** and error handling
+* **Unit-tested** game logic
 
 ### 🛠 Backend (FastAPI)
+* **RESTful API** with OpenAPI documentation
+* **Modular architecture** with clear separation of concerns
+* **Error handling** and validation
+* **CORS support** for frontend integration
+* **Logging** capabilities
+* **Test suite** with pytest
 
-* REST API endpoints for:
+### 💻 Frontend (React + TypeScript)
+* **Interactive chessboard** with piece selection and movement
+* **Game state synchronization** with backend via API calls
+* **Move history display** with turn-by-turn breakdown
+* **Modern UI** with chess piece visualization
+* **State management** with Zustand
+* **TypeScript** for type safety
 
-  * Fetching board state
-  * Making a move
-  * Resetting the game
-* Logging and error handling
-* Modular structure for scalability
-* Unit-tested with `pytest` and `TestClient`
-
-### 💻 Frontend (React)
-
-* API service file for backend communication (`src/services/api.js`)
-* (UI components not yet implemented)
-
----
-
-## 🧪 Limitations
-
-* No check/checkmate logic — the game ends when a king is removed
-* No special rules (castling, en passant, promotion)
-* No multiplayer or AI
-* Minimal UI — currently functional, not styled
+### 🔧 Development Quality
+* **Pre-commit hooks** for automated code quality
+* **Professional Git workflow** with branching strategy
+* **Automated linting** (ESLint, Prettier, Black, Flake8)
+* **Type checking** (mypy, TypeScript)
+* **Security scanning** (Bandit)
+* **Conventional commits** enforcement
 
 ---
 
@@ -53,120 +47,234 @@ chess_game/
 ├── backend/
 │   ├── app/
 │   │   ├── api/
-│   │   │   └── routes.py           # API routes (GET /board, POST /move)
+│   │   │   └── routes.py              # API endpoints
 │   │   ├── core/
-│   │   │   └── game_engine.py      # Main chess logic with logging
-│   │   ├── main.py                 # FastAPI entrypoint
+│   │   │   └── game_engine.py         # Chess logic engine
+│   │   ├── main.py                    # FastAPI application
 │   │   └── tests/
-│   │       ├── __init__.py
-│   │       ├── test_game_engine.py # Unit tests for core logic
-│   │       └── test_api.py         # Unit tests for API
-│   └── requirements.txt            # Backend dependencies
+│   │       ├── test_api.py            # API integration tests
+│   │       ├── test_game_engine.py    # Game logic tests
+│   │       └── test_integration_server.py # End-to-end tests
+│   └── requirements.txt               # Python dependencies
 │
 ├── frontend/
 │   ├── src/
-│   │   └── services/api.js         # Frontend API calls to backend
+│   │   ├── components/
+│   │   │   ├── Chessboard.tsx         # Interactive chessboard
+│   │   │   ├── MoveHistory.tsx        # Move history display
+│   │   │   └── Piece.tsx              # Chess piece component
+│   │   ├── services/
+│   │   │   └── api.ts                 # Backend API client
+│   │   ├── store.ts                   # State management
+│   │   └── App.tsx                    # Main application
+│   ├── package.json                   # Node.js dependencies
+│   └── vite.config.ts                 # Build configuration
 │
-├── README.md
-└── run_all.sh                      # Optional: run frontend & backend together
+├── .pre-commit-config.yaml            # Quality gates configuration
+├── GIT_WORKFLOW.md                    # Professional Git workflow
+├── ROADMAP.md                         # Project roadmap and phases
+├── README.md                          # This file
+└── start.sh                           # Development startup script
 ```
 
 ---
 
-## ▶️ Usage
+## 🚀 Quick Start
 
-### 🐍 Backend (FastAPI)
+### Prerequisites
+* **Python 3.9+**
+* **Node.js 18+**
+* **Git**
 
-#### Install dependencies:
-
+### 1. Clone and Setup
 ```bash
+git clone <repository-url>
+cd chess_game
+```
+
+### 2. Backend Setup
+```bash
+# Install Python dependencies
 cd backend
 pip install -r requirements.txt
-```
 
-#### Run the server:
-
-```bash
+# Run the server
 cd app
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8000
 ```
 
-* Swagger docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
----
-
-### 🌐 Frontend (React)
-
-*Not yet implemented beyond API service.*
-
-#### Install dependencies:
-
+### 3. Frontend Setup
 ```bash
+# In a new terminal
 cd frontend
 npm install
-```
-
-#### Start the React dev server:
-
-```bash
 npm run dev
 ```
 
----
-
-### 📬 API Endpoints
-
-* `GET /board` — fetch current board and state
-* `POST /move` — submit a move with JSON body: `{ "from_pos": "e2", "to_pos": "e4" }`
-* `POST /reset` — reset the game to initial state
+### 4. Access the Application
+* **Frontend**: http://localhost:5173
+* **Backend API**: http://localhost:8000
+* **API Documentation**: http://localhost:8000/docs
 
 ---
 
-## 🧪 Run Tests
+## 🧪 Testing
 
-### Backend Unit & API Tests (Recommended: pytest):
-
+### Backend Tests
 ```bash
 cd backend/app
-pytest
+pytest                           # Run all tests
+pytest -v                        # Verbose output
+pytest tests/test_api.py         # Run specific test file
+pytest --cov=app                 # With coverage report
 ```
 
-Or run a specific test file:
-
+### Frontend Tests
 ```bash
-pytest tests/test_game_engine.py
-pytest tests/test_api.py
+cd frontend
+npm run test                     # Run unit tests
+npm run test:coverage            # With coverage report
 ```
 
-> **Note:**
-> - Run tests from the `backend/app` directory. The test imports expect this as the working directory.
-> - If you see `ModuleNotFoundError: No module named 'app'` or `No module named 'core'`, check your working directory and ensure you are running the test commands from `backend/app`.
-> - For API tests, the `/move` endpoint expects a JSON body: `{ "from_pos": "e2", "to_pos": "e4" }`.
-> - If `pytest` is not installed, run `pip install pytest` inside your virtual environment.
+### Quality Gates
+```bash
+# Run pre-commit hooks manually
+pre-commit run --all-files
+
+# Install pre-commit hooks (automatic on commit)
+pre-commit install
+```
 
 ---
 
-## 📌 Todo / Improvements
+## 📬 API Reference
 
-* Implement check, checkmate, and stalemate detection
-* Support castling, en passant, and promotion
-* Add multiplayer and authentication
-* Add move history and PGN export
-* Style the frontend board with piece images
-* Add AI opponent
-* Add AI chat helper / tutor
+### Core Endpoints
+
+#### `GET /board`
+Fetch current game state
+```json
+{
+  "board": { "e2": "P", "e4": ".", ... },
+  "turn": "white",
+  "game_over": false,
+  "move_history": [...]
+}
+```
+
+#### `POST /move`
+Make a chess move
+```json
+{
+  "from_pos": "e2",
+  "to_pos": "e4"
+}
+```
+
+#### `POST /reset`
+Reset game to initial state
+```json
+{
+  "message": "Game reset",
+  "move_history": []
+}
+```
 
 ---
 
-## ✅ Requirements
+## 🔧 Development Workflow
 
-* Python 3.8+
-* Node.js 16+
+### Git Workflow
+This project follows a **professional Git workflow**:
+
+1. **Feature branches**: `feat/feature-name`
+2. **Development branches**: `dev/backend`, `dev/frontend`
+3. **Quality gates**: Pre-commit hooks enforce code quality
+4. **Conventional commits**: Structured commit messages
+
+See [GIT_WORKFLOW.md](./GIT_WORKFLOW.md) for detailed workflow.
+
+### Code Quality
+* **Pre-commit hooks** run automatically on every commit
+* **ESLint + Prettier** for frontend code
+* **Black + isort + flake8** for Python code
+* **TypeScript + mypy** for type safety
+* **Bandit** for security scanning
+
+### Adding Features
+1. Create feature branch from appropriate dev branch
+2. Implement feature with tests
+3. Ensure all quality gates pass
+4. Create pull request
+5. Code review and merge
+
+---
+
+## 🎯 Current Status
+
+### ✅ Implemented
+* Basic chess game logic with piece movement
+* Interactive frontend with React
+* RESTful API with FastAPI
+* Testing suite for backend
+* Professional Git workflow
+* Automated quality gates
+* Move history tracking
+* Game over detection (king capture)
+
+### 🚧 In Progress
+* Enhanced UI/UX improvements
+* Additional chess features
+
+### 📋 Planned
+* Check and checkmate detection
+* Castling, en passant, and pawn promotion
+* Multiplayer support
+* AI opponent
+* Game analysis tools
+* Tournament mode
+* Mobile responsiveness
+
+---
+
+## ⚠️ Limitations
+
+* **No check detection** - moves that put your own king in check are allowed
+* **No checkmate detection** - game only ends when a king is captured
+* **No stalemate detection** - game continues even in stalemate positions
+* **No special moves** - castling, en passant, and pawn promotion not implemented
+* **Basic UI** - functional but minimal styling
+
+---
+
+## 🤝 Contributing
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feat/amazing-feature`)
+3. **Follow** the Git workflow and quality standards
+4. **Test** your changes thoroughly
+5. **Commit** with conventional commit format
+6. **Push** to your branch (`git push origin feat/amazing-feature`)
+7. **Open** a Pull Request
+
+### Development Standards
+* Follow the established Git workflow
+* Ensure all pre-commit hooks pass
+* Write tests for new features
+* Update documentation as needed
+* Use conventional commit messages
 
 ---
 
 ## 📄 License
 
-Licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
+
+## 🙏 Acknowledgments
+
+* Built with modern web technologies
+* Follows development best practices
+* Emphasizes code quality and maintainability
+* Designed for learning and extension
