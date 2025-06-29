@@ -45,6 +45,9 @@ const Chessboard: React.FC = () => {
     }
   }
 
+  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+  const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+
   return (
     <div style={{ position: 'relative' }}>
       {gameOver && (
@@ -72,45 +75,99 @@ const Chessboard: React.FC = () => {
           </div>
         </div>
       )}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateRows: 'repeat(8, 1fr)',
-          gridTemplateColumns: 'repeat(8, 1fr)',
-          width: 400,
-          height: 400,
-          border: '2px solid #333',
-          opacity: gameOver ? 0.6 : delayedLoading ? 0.5 : 1,
-        }}
-      >
-        {board.map((row, rowIdx) =>
-          row.map((piece, colIdx) => {
-            const isLight = (rowIdx + colIdx) % 2 === 1;
-            const isSelected =
-              selectedSquare && selectedSquare[0] === rowIdx && selectedSquare[1] === colIdx;
-            return (
-              <div
-                key={`${rowIdx}-${colIdx}`}
-                onClick={() => handleSquareClick(rowIdx, colIdx)}
-                style={{
-                  background: isSelected ? '#ff0' : isLight ? '#f0d9b5' : '#b58863',
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 32,
-                  cursor: loading || gameOver ? 'not-allowed' : 'pointer',
-                  boxSizing: 'border-box',
-                  border: isSelected ? '2px solid #f90' : undefined,
-                  opacity: delayedLoading ? 0.5 : 1,
-                }}
-              >
-                {piece ? <Piece type={piece.type} color={piece.color} /> : null}
+
+      {/* Chessboard with coordinates */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/* Top coordinate area (empty for now, could be used for perspective) */}
+        <div style={{ height: 20, width: 400 }}></div>
+
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {/* Left coordinate area (ranks) */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: 20,
+              height: 400,
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingTop: 0,
+              paddingBottom: 0,
+              boxSizing: 'border-box',
+            }}
+          >
+            {ranks.map((rank) => (
+              <div key={rank} className="chessboard-coordinate chessboard-rank">
+                {rank}
               </div>
-            );
-          }),
-        )}
+            ))}
+          </div>
+
+          {/* Main chessboard */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateRows: 'repeat(8, 1fr)',
+              gridTemplateColumns: 'repeat(8, 1fr)',
+              width: 400,
+              height: 400,
+              border: '2px solid #333',
+              opacity: gameOver ? 0.6 : delayedLoading ? 0.5 : 1,
+            }}
+          >
+            {board.map((row, rowIdx) =>
+              row.map((piece, colIdx) => {
+                const isLight = (rowIdx + colIdx) % 2 === 1;
+                const isSelected =
+                  selectedSquare && selectedSquare[0] === rowIdx && selectedSquare[1] === colIdx;
+                return (
+                  <div
+                    key={`${rowIdx}-${colIdx}`}
+                    onClick={() => handleSquareClick(rowIdx, colIdx)}
+                    style={{
+                      background: isSelected ? '#ff0' : isLight ? '#f0d9b5' : '#b58863',
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 32,
+                      cursor: loading || gameOver ? 'not-allowed' : 'pointer',
+                      boxSizing: 'border-box',
+                      border: isSelected ? '2px solid #f90' : undefined,
+                      opacity: delayedLoading ? 0.5 : 1,
+                    }}
+                  >
+                    {piece ? <Piece type={piece.type} color={piece.color} /> : null}
+                  </div>
+                );
+              }),
+            )}
+          </div>
+
+          {/* Right coordinate area (empty for now, could be used for perspective) */}
+          <div style={{ width: 20, height: 400 }}></div>
+        </div>
+
+        {/* Bottom coordinate area (files) */}
+        <div
+          style={{
+            display: 'flex',
+            width: 400,
+            height: 20,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingLeft: 0,
+            paddingRight: 0,
+            boxSizing: 'border-box',
+          }}
+        >
+          {files.map((file) => (
+            <div key={file} className="chessboard-coordinate chessboard-file">
+              {file}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
