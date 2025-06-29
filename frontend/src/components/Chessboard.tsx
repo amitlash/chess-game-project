@@ -9,7 +9,6 @@ const Chessboard: React.FC = () => {
   const sendMove = useChessStore((state) => state.sendMove);
   const fetchBoard = useChessStore((state) => state.fetchBoard);
   const loading = useChessStore((state) => state.loading);
-  const error = useChessStore((state) => state.error);
   const gameOver = useChessStore((state) => state.gameOver);
   const turn = useChessStore((state) => state.turn);
 
@@ -49,22 +48,24 @@ const Chessboard: React.FC = () => {
   return (
     <div style={{ position: 'relative' }}>
       {gameOver && (
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          color: 'white',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 10,
-          fontSize: '2rem',
-          fontWeight: 'bold',
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            color: 'white',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10,
+            fontSize: '2rem',
+            fontWeight: 'bold',
+          }}
+        >
           <div>Game Over</div>
           <div style={{ fontSize: '1.2rem', marginTop: '0.5rem' }}>
             {turn === 'white' ? 'Black' : 'White'} wins!
@@ -85,17 +86,14 @@ const Chessboard: React.FC = () => {
         {board.map((row, rowIdx) =>
           row.map((piece, colIdx) => {
             const isLight = (rowIdx + colIdx) % 2 === 1;
-            const isSelected = selectedSquare && selectedSquare[0] === rowIdx && selectedSquare[1] === colIdx;
+            const isSelected =
+              selectedSquare && selectedSquare[0] === rowIdx && selectedSquare[1] === colIdx;
             return (
               <div
                 key={`${rowIdx}-${colIdx}`}
                 onClick={() => handleSquareClick(rowIdx, colIdx)}
                 style={{
-                  background: isSelected
-                    ? '#ff0'
-                    : isLight
-                    ? '#f0d9b5'
-                    : '#b58863',
+                  background: isSelected ? '#ff0' : isLight ? '#f0d9b5' : '#b58863',
                   width: '100%',
                   height: '100%',
                   display: 'flex',
@@ -111,11 +109,11 @@ const Chessboard: React.FC = () => {
                 {piece ? <Piece type={piece.type} color={piece.color} /> : null}
               </div>
             );
-          })
+          }),
         )}
       </div>
     </div>
   );
 };
 
-export default Chessboard; 
+export default Chessboard;

@@ -36,7 +36,7 @@ For each feature/change:
    ```bash
    git add .
    git commit -m "feat(component): description
-   
+
    - Detailed bullet points
    - Of changes made
    - And their impact"
@@ -84,11 +84,11 @@ Before creating any feature branch:
    - Use conventional commit format:
      ```bash
      git commit -m "feat(component): add move validation
-     
+
      - Implement pawn movement rules
      - Add diagonal capture validation
      - Include edge case handling for first move
-     
+
      Closes #123"
      ```
 3. **Regular synchronization with dev:**
@@ -296,4 +296,4 @@ Closes #123
 
 ---
 
-*This workflow ensures consistent, professional development practices and should be followed by all team members.* 
+*This workflow ensures consistent, professional development practices and should be followed by all team members.*

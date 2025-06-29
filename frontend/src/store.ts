@@ -56,7 +56,7 @@ function backendBoardToFrontend(board: Record<string, string>): Board {
       const color = code === code.toUpperCase() ? 'white' : 'black';
       const type = code.toUpperCase() as PieceType;
       return { type, color };
-    })
+    }),
   );
 }
 
@@ -72,7 +72,7 @@ export interface ChessState {
   sendMove: (from: [number, number], to: [number, number]) => Promise<void>;
   sendReset: () => Promise<void>;
   selectSquare: (square: [number, number] | null) => void;
-  movePiece: (to: [number, number]) => void;
+  movePiece: () => void;
   reset: () => void;
 }
 
@@ -96,8 +96,9 @@ export const useChessStore = create<ChessState>((set, get) => ({
         loading: false,
         error: null,
       });
-    } catch (e: any) {
-      set({ loading: false, error: e.message || 'Failed to fetch board' });
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'Failed to fetch board';
+      set({ loading: false, error: errorMessage });
     }
   },
   sendMove: async (from, to) => {
@@ -120,8 +121,9 @@ export const useChessStore = create<ChessState>((set, get) => ({
         loading: false,
         error: null,
       });
-    } catch (e: any) {
-      set({ loading: false, error: e.message || 'Failed to make move' });
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'Failed to make move';
+      set({ loading: false, error: errorMessage });
     }
   },
   sendReset: async () => {
@@ -130,13 +132,21 @@ export const useChessStore = create<ChessState>((set, get) => ({
       const data = await api.resetGame();
       set({ moveHistory: data.move_history || [] });
       await get().fetchBoard();
-    } catch (e: any) {
-      set({ loading: false, error: e.message || 'Failed to reset game' });
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'Failed to reset game';
+      set({ loading: false, error: errorMessage });
     }
   },
   selectSquare: (square) => set({ selectedSquare: square }),
-  movePiece: (to) => {
+  movePiece: () => {
     // This will be replaced by sendMove in the UI
   },
-  reset: () => set({ board: getInitialBoard(), moveHistory: [], turn: 'white', selectedSquare: null, gameOver: false }),
-})); 
+  reset: () =>
+    set({
+      board: getInitialBoard(),
+      moveHistory: [],
+      turn: 'white',
+      selectedSquare: null,
+      gameOver: false,
+    }),
+}));

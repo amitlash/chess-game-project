@@ -13,4 +13,4 @@ PORT=${2:-8000}
 export PYTHONPATH="$SCRIPT_DIR"
 
 echo "Starting FastAPI backend at http://$HOST:$PORT ..."
-uvicorn app.main:app --host $HOST --port $PORT --reload 
+uvicorn app.main:app --host $HOST --port $PORT --reload

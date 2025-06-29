@@ -1,6 +1,7 @@
 import logging
-from fastapi import APIRouter, HTTPException
+
 from app.core.game_engine import ChessGame
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -20,9 +21,11 @@ API routes for the chess backend.
 def read_root():
     return {"message": "Welcome to the API!"}
 
+
 class MoveRequest(BaseModel):
     from_pos: str
     to_pos: str
+
 
 @router.get("/board")
 def get_board():
@@ -38,8 +41,9 @@ def get_board():
         "board": game.board,
         "turn": game.turn,
         "game_over": game.game_over,
-        "move_history": game.move_history
+        "move_history": game.move_history,
     }
+
 
 @router.post("/move")
 def make_move(move: MoveRequest):
@@ -52,12 +56,14 @@ def make_move(move: MoveRequest):
     Returns:
         dict: Result of the move attempt including success status,
               updated board, current turn, game_over flag, and move history.
-    
+
     Raises:
         HTTPException: 409 error if the game is already over.
     """
     if game.game_over:
-        raise HTTPException(status_code=409, detail="Game is over. No more moves allowed.")
+        raise HTTPException(
+            status_code=409, detail="Game is over. No more moves allowed."
+        )
 
     logger.info(f"Move request: {move.from_pos} to {move.to_pos} by {game.turn}.")
     success = game.make_move(move.from_pos, move.to_pos)
@@ -67,8 +73,9 @@ def make_move(move: MoveRequest):
         "board": game.board,
         "game_over": game.game_over,
         "turn": game.turn,
-        "move_history": game.move_history
+        "move_history": game.move_history,
     }
+
 
 @router.post("/reset")
 def reset_game():
@@ -81,7 +88,4 @@ def reset_game():
     global game
     game.reset()
     logger.info("Game has been reset to initial state.")
-    return {
-        "message": "Game reset",
-        "move_history": game.move_history
-    }
+    return {"message": "Game reset", "move_history": game.move_history}

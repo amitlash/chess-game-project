@@ -58,7 +58,7 @@
 }
 
 .reset-button {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   border: none;
   color: white;
   padding: 10px 20px;
@@ -101,7 +101,7 @@
 }
 
 .move-history-container:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
 }
 
 .move-history-title {
@@ -109,8 +109,9 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-top: 0.5rem;
-  margin-bottom: 0.5rem;  letter-spacing: 0.7px;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.7px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   font-family: cursive;
 }
 
@@ -130,7 +131,7 @@
   width: 7px;
 }
 .move-history-list::-webkit-scrollbar-thumb {
-  background: rgba(96,165,250,0.18);
+  background: rgba(96, 165, 250, 0.18);
   border-radius: 6px;
 }
 .move-history-list::-webkit-scrollbar-track {
@@ -142,16 +143,18 @@
   font-size: 1.05rem;
   font-weight: 500;
   color: #f9fafb;
-  background: linear-gradient(90deg, rgba(96,165,250,0.18) 0%, rgba(255,255,255,0.08) 100%);
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
   border-radius: 999px;
   padding: 6px 16px;
   display: inline-block;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-  transition: background 0.18s, color 0.18s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  transition:
+    background 0.18s,
+    color 0.18s;
 }
 
 .move-history-item:nth-child(even) {
-  background: linear-gradient(90deg, rgba(59,130,246,0.22) 0%, rgba(255,255,255,0.10) 100%);
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.22) 0%, rgba(255, 255, 255, 0.1) 100%);
   color: #e0e7ef;
 }
 

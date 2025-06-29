@@ -17,7 +17,9 @@ const pieceToFile = {
 const Piece: React.FC<PieceProps> = ({ type, color }) => {
   const fileName = pieceToFile[type][color];
   const src = new URL(`../assets/pieces/${fileName}`, import.meta.url).href;
-  return <img src={src} alt={`${color} ${type}`} style={{ width: 40, height: 40 }} draggable={false} />;
+  return (
+    <img src={src} alt={`${color} ${type}`} style={{ width: 40, height: 40 }} draggable={false} />
+  );
 };
 
-export default Piece; 
+export default Piece;

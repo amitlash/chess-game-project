@@ -139,4 +139,4 @@ A feature is considered done when:
 
 *Note: This roadmap is a living document. Update it as the project evolves and new requirements are discovered.*
 
-**📋 Git Workflow Reference:** See [GIT_WORKFLOW.md](./GIT_WORKFLOW.md) for detailed Git workflow and branching strategy. 
+**📋 Git Workflow Reference:** See [GIT_WORKFLOW.md](./GIT_WORKFLOW.md) for detailed Git workflow and branching strategy.

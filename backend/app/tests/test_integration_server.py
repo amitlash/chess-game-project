@@ -1,22 +1,27 @@
-import subprocess
-import time
-import requests
-import unittest
 import os
 import signal
 import socket
+import subprocess
+import time
+import unittest
 from pathlib import Path
+
+import requests
+
 
 def get_free_port():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('', 0))
+        s.bind(("", 0))
         return s.getsockname()[1]
+
 
 class TestUvicornIntegration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.port = get_free_port()
-        backend_dir = Path(__file__).resolve().parent.parent.parent  # points to .../backend
+        backend_dir = (
+            Path(__file__).resolve().parent.parent.parent
+        )  # points to .../backend
         env = os.environ.copy()
         env["PYTHONPATH"] = str(backend_dir)
         cls.server = subprocess.Popen(
@@ -25,7 +30,7 @@ class TestUvicornIntegration(unittest.TestCase):
             stderr=subprocess.PIPE,
             preexec_fn=os.setsid,
             cwd=str(backend_dir),
-            env=env
+            env=env,
         )
 
         # Wait for server to start
@@ -52,7 +57,7 @@ class TestUvicornIntegration(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if hasattr(cls, 'server') and cls.server:
+        if hasattr(cls, "server") and cls.server:
             try:
                 if cls.server.poll() is None:
                     os.killpg(os.getpgid(cls.server.pid), signal.SIGTERM)

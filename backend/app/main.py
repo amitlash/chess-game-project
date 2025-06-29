@@ -1,11 +1,11 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import router as chess_router
 import logging
 
+from app.api.routes import router as chess_router
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 
 app = FastAPI()
