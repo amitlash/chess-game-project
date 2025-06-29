@@ -28,16 +28,17 @@ class MoveRequest(BaseModel):
 def get_board():
     """
     Retrieve the current game state including the board layout,
-    current turn, and whether the game is over.
+    current turn, whether the game is over, and move history.
 
     Returns:
-        dict: Dictionary containing 'board', 'turn', and 'game_over' keys.
+        dict: Dictionary containing 'board', 'turn', 'game_over', and 'move_history' keys.
     """
     logger.debug("Fetching current board state.")
     return {
         "board": game.board,
         "turn": game.turn,
-        "game_over": game.game_over
+        "game_over": game.game_over,
+        "move_history": game.move_history
     }
 
 @router.post("/move")
@@ -50,7 +51,7 @@ def make_move(move: MoveRequest):
 
     Returns:
         dict: Result of the move attempt including success status,
-              updated board, current turn, and game_over flag.
+              updated board, current turn, game_over flag, and move history.
     
     Raises:
         HTTPException: 409 error if the game is already over.
@@ -65,7 +66,8 @@ def make_move(move: MoveRequest):
         "success": success,
         "board": game.board,
         "game_over": game.game_over,
-        "turn": game.turn
+        "turn": game.turn,
+        "move_history": game.move_history
     }
 
 @router.post("/reset")
@@ -74,9 +76,12 @@ def reset_game():
     Reset the chess game to its initial state.
 
     Returns:
-        dict: Confirmation message that the game has been reset.
+        dict: Confirmation message that the game has been reset, including empty move history.
     """
     global game
-    game = ChessGame()
+    game.reset()
     logger.info("Game has been reset to initial state.")
-    return {"message": "Game reset"}
+    return {
+        "message": "Game reset",
+        "move_history": game.move_history
+    }

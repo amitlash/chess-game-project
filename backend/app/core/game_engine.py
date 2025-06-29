@@ -1,5 +1,5 @@
 import logging
-from typing import Dict
+from typing import Dict, List
 
 Position = str  # e.g., 'e4'
 Piece = str     # e.g., 'P', 'k', etc.
@@ -20,6 +20,7 @@ class ChessGame:
         self.board: Dict[Position, Piece] = self._initial_board()
         self.turn = 'white'
         self.game_over = False
+        self.move_history: List[Dict] = []
         logger.info("ChessGame initialized.")
 
     def _initial_board(self) -> Dict[Position, Piece]:
@@ -108,6 +109,36 @@ class ChessGame:
             'b': 'bishop', 'q': 'queen', 'k': 'king'
         }.get(symbol.lower(), 'piece')
 
+    def _generate_algebraic_notation(self, piece: Piece, from_pos: Position, to_pos: Position, is_capture: bool = False) -> str:
+        """
+        Generate algebraic notation for a move.
+
+        Args:
+            piece (Piece): The piece being moved.
+            from_pos (Position): Starting position.
+            to_pos (Position): Ending position.
+            is_capture (bool): Whether this move captures a piece.
+
+        Returns:
+            str: Algebraic notation for the move.
+        """
+        piece_symbol = piece.upper()
+        
+        # For pawns, just show the destination square
+        if piece_symbol == 'P':
+            if is_capture:
+                return f"{from_pos[0]}x{to_pos}"
+            return to_pos
+        
+        # For other pieces, include the piece symbol
+        piece_letter = {
+            'R': 'R', 'N': 'N', 'B': 'B', 'Q': 'Q', 'K': 'K'
+        }.get(piece_symbol, '')
+        
+        if is_capture:
+            return f"{piece_letter}x{to_pos}"
+        return f"{piece_letter}{to_pos}"
+
     def check_game_over(self):
         """
         Check if either king is missing and set the game_over flag if so.
@@ -162,11 +193,30 @@ class ChessGame:
             logger.warning(f"Illegal move attempted: {piece} ({self.get_piece_color(piece)}) from {from_pos} to {to_pos}.")
             return False
 
+        # Record the move before executing it
+        is_capture = target_piece != '.'
+        turn_number = (len(self.move_history) // 2) + 1
+        
+        move_record = {
+            'from_pos': from_pos,
+            'to_pos': to_pos,
+            'piece': piece,
+            'color': self.turn,
+            'captured_piece': target_piece if is_capture else None,
+            'is_capture': is_capture,
+            'algebraic_notation': self._generate_algebraic_notation(piece, from_pos, to_pos, is_capture),
+            'turn_number': turn_number
+        }
+        
         if target_piece != '.':
             logger.info(f"{self.turn.capitalize()} {self._piece_name(piece)} ({piece}) captures {self.get_piece_color(target_piece)} {self._piece_name(target_piece)} ({target_piece}) on {to_pos}.")
 
+        # Execute the move
         self.board[to_pos] = piece
         self.board[from_pos] = '.'
+        
+        # Add move to history
+        self.move_history.append(move_record)
 
         self.check_game_over()
 
@@ -270,3 +320,14 @@ class ChessGame:
                 self.board[pos] = '.'
                 logger.debug(f"Removed piece {symbol} from {pos}.")
                 break
+
+    def reset(self):
+        """
+        Reset the chess game to its initial state.
+        Clears the board, move history, and resets turn to white.
+        """
+        self.board = self._initial_board()
+        self.turn = 'white'
+        self.game_over = False
+        self.move_history = []
+        logger.info("ChessGame reset to initial state.")
