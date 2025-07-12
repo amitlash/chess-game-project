@@ -1,5 +1,7 @@
 import logging
+from typing import Dict, List
 
+from app.core.ai_service import AIService
 from app.core.game_engine import ChessGame
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -7,6 +9,7 @@ from pydantic import BaseModel
 router = APIRouter()
 logger = logging.getLogger(__name__)
 game = ChessGame()
+ai_service = AIService(use_multi_move_cache=True, cache_size=5)
 
 """
 API routes for the chess backend.
@@ -14,17 +17,42 @@ API routes for the chess backend.
 - /board: GET current board state
 - /move: POST a move (expects JSON body: {"from_pos": ..., "to_pos": ...})
 - /reset: POST to reset the game
+- /chat: POST chat message with AI assistant
+- /ai-move: POST to get AI move suggestion
+- /analyze: GET position analysis from AI
+- /game-mode: POST to set game mode (human vs human, human vs ai)
 """
 
 
 @router.get("/")
 def read_root():
-    return {"message": "Welcome to the API!"}
+    return {"message": "Welcome to the Chess API with AI integration!"}
 
 
 class MoveRequest(BaseModel):
     from_pos: str
     to_pos: str
+
+
+class ChatRequest(BaseModel):
+    message: str
+    message_history: List[Dict[str, str]] = []
+
+
+class GameModeRequest(BaseModel):
+    mode: str  # "human_vs_human" or "human_vs_ai"
+    ai_color: str = "black"  # "white" or "black"
+
+
+class AIMoveRequest(BaseModel):
+    board: Dict[str, str]
+    turn: str
+    move_history: List[Dict] = []
+
+
+class AIStrategyRequest(BaseModel):
+    use_multi_move_cache: bool = True
+    cache_size: int = 5
 
 
 @router.get("/board")
@@ -89,3 +117,280 @@ def reset_game():
     game.reset()
     logger.info("Game has been reset to initial state.")
     return {"message": "Game reset", "move_history": game.move_history}
+
+
+@router.post("/chat")
+def chat_with_ai(chat_request: ChatRequest):
+    """
+    Chat with the AI assistant about chess.
+
+    Args:
+        chat_request (ChatRequest): The chat request containing message and history.
+
+    Returns:
+        dict: AI assistant response and updated message history.
+    """
+    try:
+        logger.info(f"Chat request received: {chat_request.message[:50]}...")
+
+        # Use board-aware chat method with current game state
+        ai_response = ai_service.chat_with_assistant(
+            chat_request.message_history,
+            chat_request.message,
+            board=game.board,
+            turn=game.turn,
+        )
+
+        # Update message history
+        updated_history = chat_request.message_history + [
+            {"role": "user", "content": chat_request.message},
+            {"role": "assistant", "content": ai_response},
+        ]
+
+        logger.debug("Chat response generated successfully")
+        return {"response": ai_response, "message_history": updated_history}
+
+    except Exception as e:
+        logger.error(f"Error in chat endpoint: {e}")
+        raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")
+
+
+@router.post("/ai-move")
+def get_ai_move(ai_request: AIMoveRequest):
+    """
+    Get an AI move suggestion for the current position.
+
+    Args:
+        ai_request (AIMoveRequest): The request containing board state and turn.
+
+    Returns:
+        dict: AI move suggestion or error message.
+    """
+    try:
+        logger.info("AI move request received")
+
+        ai_move = ai_service.generate_ai_move(
+            ai_request.board,
+            ai_request.turn,
+            ai_request.move_history,
+            game,  # Pass the game engine instance
+        )
+
+        if ai_move:
+            from_pos, to_pos = ai_move
+            logger.info(f"AI suggested move: {from_pos} to {to_pos}")
+            return {
+                "success": True,
+                "from_pos": from_pos,
+                "to_pos": to_pos,
+                "move": f"{from_pos} {to_pos}",
+            }
+        else:
+            logger.warning("No AI move available")
+            return {"success": False, "message": "No legal moves available for AI"}
+
+    except Exception as e:
+        logger.error(f"Error generating AI move: {e}")
+        raise HTTPException(status_code=500, detail=f"AI move error: {str(e)}")
+
+
+@router.get("/analyze")
+def analyze_position():
+    """
+    Get AI analysis of the current board position.
+
+    Returns:
+        dict: AI analysis of the current position.
+    """
+    try:
+        logger.info("Position analysis request received")
+
+        analysis = ai_service.analyze_position(game.board, game.turn)
+
+        logger.debug("Position analysis generated successfully")
+        return {"analysis": analysis, "board": game.board, "turn": game.turn}
+
+    except Exception as e:
+        logger.error(f"Error analyzing position: {e}")
+        raise HTTPException(status_code=500, detail=f"Analysis error: {str(e)}")
+
+
+@router.post("/game-mode")
+def set_game_mode(mode_request: GameModeRequest):
+    """
+    Set the game mode (human vs human or human vs ai).
+
+    Args:
+        mode_request (GameModeRequest): The game mode configuration.
+
+    Returns:
+        dict: Confirmation of game mode setting.
+    """
+    try:
+        valid_modes = ["human_vs_human", "human_vs_ai"]
+        valid_colors = ["white", "black"]
+
+        if mode_request.mode not in valid_modes:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid game mode. Must be one of: {valid_modes}",
+            )
+
+        if mode_request.ai_color not in valid_colors:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid AI color. Must be one of: {valid_colors}",
+            )
+
+        # Store game mode in a simple way (in production, use proper state management)
+        game.game_mode = mode_request.mode
+        game.ai_color = mode_request.ai_color
+
+        logger.info(
+            f"Game mode set to: {mode_request.mode}, AI color: {mode_request.ai_color}"
+        )
+
+        return {
+            "message": "Game mode updated successfully",
+            "mode": mode_request.mode,
+            "ai_color": mode_request.ai_color,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error setting game mode: {e}")
+        raise HTTPException(status_code=500, detail=f"Game mode error: {str(e)}")
+
+
+@router.post("/ai-play")
+def ai_play_move():
+    """
+    Make an AI move in the current game.
+    This endpoint automatically makes the AI's move if it's the AI's turn.
+
+    Returns:
+        dict: Result of the AI move including updated game state.
+    """
+    try:
+        # Check if it's AI's turn
+        if not hasattr(game, "game_mode") or game.game_mode != "human_vs_ai":
+            raise HTTPException(
+                status_code=400,
+                detail="AI mode not enabled. Set game mode to 'human_vs_ai' first.",
+            )
+
+        if not hasattr(game, "ai_color"):
+            game.ai_color = "black"  # Default AI color
+
+        if game.turn != game.ai_color:
+            raise HTTPException(
+                status_code=400,
+                detail=f"It's not AI's turn. Current turn: {game.turn}, AI color: {game.ai_color}",
+            )
+
+        if game.game_over:
+            raise HTTPException(
+                status_code=409, detail="Game is over. No more moves allowed."
+            )
+
+        # Generate AI move
+        ai_move = ai_service.generate_ai_move(
+            game.board,
+            game.turn,
+            game.move_history,
+            game,  # Pass the game engine instance
+        )
+
+        if not ai_move:
+            raise HTTPException(
+                status_code=500, detail="AI could not generate a valid move."
+            )
+
+        # Make the AI move
+        from_pos, to_pos = ai_move
+        success = game.make_move(from_pos, to_pos)
+
+        logger.info(f"AI made move: {from_pos} to {to_pos}, success: {success}")
+
+        return {
+            "success": success,
+            "ai_move": {"from_pos": from_pos, "to_pos": to_pos},
+            "board": game.board,
+            "game_over": game.game_over,
+            "turn": game.turn,
+            "move_history": game.move_history,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in AI play: {e}")
+        raise HTTPException(status_code=500, detail=f"AI play error: {str(e)}")
+
+
+@router.post("/ai-strategy")
+def set_ai_strategy(strategy_request: AIStrategyRequest):
+    """
+    Set the AI strategy (multi-move caching vs single-move full analysis).
+
+    Args:
+        strategy_request (AIStrategyRequest): The AI strategy configuration.
+
+    Returns:
+        dict: Confirmation of AI strategy setting.
+    """
+    try:
+        # Update AI service strategy
+        ai_service.set_strategy(
+            use_multi_move_cache=strategy_request.use_multi_move_cache,
+            cache_size=strategy_request.cache_size,
+        )
+
+        strategy_name = (
+            "multi-move caching"
+            if strategy_request.use_multi_move_cache
+            else "single-move full analysis"
+        )
+
+        logger.info(
+            f"AI strategy set to: {strategy_name}, cache size: {strategy_request.cache_size}"
+        )
+
+        return {
+            "message": "AI strategy updated successfully",
+            "strategy": strategy_name,
+            "use_multi_move_cache": strategy_request.use_multi_move_cache,
+            "cache_size": strategy_request.cache_size,
+        }
+
+    except Exception as e:
+        logger.error(f"Error setting AI strategy: {e}")
+        raise HTTPException(status_code=500, detail=f"AI strategy error: {str(e)}")
+
+
+@router.get("/ai-config")
+def get_ai_config():
+    """
+    Get the current AI configuration.
+
+    Returns:
+        dict: Current AI strategy and configuration.
+    """
+    try:
+        strategy_name = (
+            "multi-move caching"
+            if ai_service.use_multi_move_cache
+            else "single-move full analysis"
+        )
+
+        return {
+            "strategy": strategy_name,
+            "use_multi_move_cache": ai_service.use_multi_move_cache,
+            "cache_size": ai_service.cache_size,
+            "cached_moves_count": len(ai_service.move_queue),
+        }
+
+    except Exception as e:
+        logger.error(f"Error getting AI config: {e}")
+        raise HTTPException(status_code=500, detail=f"AI config error: {str(e)}")

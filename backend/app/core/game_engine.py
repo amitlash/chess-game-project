@@ -21,6 +21,8 @@ class ChessGame:
         self.turn = "white"
         self.game_over = False
         self.move_history: List[Dict] = []
+        self.game_mode = "human_vs_human"  # Default game mode
+        self.ai_color = "black"  # Default AI color
         logger.info("ChessGame initialized.")
 
     def _initial_board(self) -> Dict[Position, Piece]:
