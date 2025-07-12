@@ -1,0 +1,147 @@
+.ai-strategy-selector {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  max-width: 600px;
+}
+
+.ai-strategy-selector h3 {
+  margin: 0 0 20px 0;
+  color: #495057;
+  font-size: 1.5rem;
+}
+
+.strategy-section {
+  background: #e9ecef;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.strategy-section h4 {
+  margin: 0 0 10px 0;
+  color: #495057;
+}
+
+.strategy-section p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.controls-section {
+  margin-bottom: 20px;
+}
+
+.control-group {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.control-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+.control-group input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #007bff;
+}
+
+.control-group input[type='number'] {
+  width: 60px;
+  padding: 5px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.description {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.strategy-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.strategy-button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.strategy-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.info-section {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.info-section h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.comparison-item {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.comparison-item strong {
+  color: #495057;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.comparison-item ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.comparison-item li {
+  margin-bottom: 5px;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-strategy-selector {
+    padding: 15px;
+  }
+}
