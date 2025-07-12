@@ -41,7 +41,8 @@ class AIService:
         self.cache_size = cache_size
 
         logger.info(
-            f"AIService initialized - Multi-move cache: {use_multi_move_cache}, Cache size: {cache_size}"
+            f"AIService initialized - Multi-move cache: {use_multi_move_cache}, "
+            f"Cache size: {cache_size}"
         )
 
     def set_strategy(self, use_multi_move_cache: bool, cache_size: int = 5):
@@ -56,7 +57,8 @@ class AIService:
         self.cache_size = cache_size
         self.move_queue = []  # Clear queue when changing strategy
         logger.info(
-            f"AI strategy changed - Multi-move cache: {use_multi_move_cache}, Cache size: {cache_size}"
+            f"AI strategy changed - Multi-move cache: {use_multi_move_cache}, "
+            f"Cache size: {cache_size}"
         )
 
     def _rate_limit(self):
@@ -122,7 +124,8 @@ class AIService:
         turn: Optional[str] = None,
     ) -> str:
         """
-        Chat with the AI assistant. If board is provided, use a robust prompt to ground the conversation in the actual board state.
+        Chat with the AI assistant. If board is provided, use a robust prompt to ground
+        the conversation in the actual board state.
 
         Args:
             message_history: Previous conversation history
@@ -159,7 +162,20 @@ class AIService:
 
             system_prompt = {
                 "role": "system",
-                "content": """You are a chess expert assistant. You will be given a chess board state and a mapping of all pieces and their positions.\n\nYour job is to:\n1. List all pieces and their positions for both White and Black, exactly as given.\n2. When answering questions or providing advice, refer ONLY to the pieces and pawns that are actually present on the board.\n3. Do NOT mention or analyze any piece, pawn, or square that does not exist in the given board state.\n4. If a square is empty, do not mention it.\n5. If a piece is in an unusual or illegal position, mention this fact.\n\nBe precise and do not hallucinate. Your responses must be based strictly on the provided board state.""",
+                "content": (
+                    "You are a chess expert assistant. You will be given a chess board state "
+                    "and a mapping of all pieces and their positions.\n\n"
+                    "Your job is to:\n"
+                    "1. List all pieces and their positions for both White and Black, exactly as given.\n"
+                    "2. When answering questions or providing advice, refer ONLY to the pieces and "
+                    "pawns that are actually present on the board.\n"
+                    "3. Do NOT mention or analyze any piece, pawn, or square that does not exist "
+                    "in the given board state.\n"
+                    "4. If a square is empty, do not mention it.\n"
+                    "5. If a piece is in an unusual or illegal position, mention this fact.\n\n"
+                    "Be precise and do not hallucinate. Your responses must be based strictly "
+                    "on the provided board state."
+                ),
             }
 
             board_context = f"""Current turn: {turn if turn else '?'}\n\nPieces on the board:\n{piece_listing}\n"""
@@ -172,7 +188,15 @@ class AIService:
         else:
             system_prompt = {
                 "role": "system",
-                "content": """You are a helpful chess assistant. You can:\n- Answer questions about chess rules and strategies\n- Help analyze chess positions\n- Provide tips and advice for improving chess skills\n- Engage in friendly conversation about chess\n- Explain chess concepts in an accessible way\n\nBe friendly, knowledgeable, and encouraging. Keep responses concise but informative.""",
+                "content": (
+                    "You are a helpful chess assistant. You can:\n"
+                    "- Answer questions about chess rules and strategies\n"
+                    "- Help analyze chess positions\n"
+                    "- Provide tips and advice for improving chess skills\n"
+                    "- Engage in friendly conversation about chess\n"
+                    "- Explain chess concepts in an accessible way\n\n"
+                    "Be friendly, knowledgeable, and encouraging. Keep responses concise but informative."
+                ),
             }
             messages = (
                 [system_prompt]
@@ -285,29 +309,29 @@ class AIService:
             # Create prompt for full board analysis
             system_prompt = {
                 "role": "system",
-                "content": """You are a chess AI assistant. Analyze the EXACT current position and suggest the best legal move.
-
-                CRITICAL RULES:
-                - You MUST analyze the actual current board position provided in FEN notation
-                - Only suggest moves that are legal for the current position
-                - Do NOT suggest moves that are impossible (e.g., moving pawns that have already moved)
-                - Consider the actual piece positions, not generic opening theory
-                - Analyze the full board position to determine the best strategic move
-                - Respond with ONLY a move in the format "from_pos to_pos" (e.g., "e7 e5")
-                - Do not include any explanations or additional text - just the move coordinates
-
-                RESPONSE FORMAT: Respond with exactly "from_pos to_pos" (e.g., "e7 e5")
-                """,
+                "content": (
+                    "You are a chess AI assistant. Analyze the EXACT current position and "
+                    "suggest the best legal move.\n\n"
+                    "CRITICAL RULES:\n"
+                    "- You MUST analyze the actual current board position provided in FEN notation\n"
+                    "- Only suggest moves that are legal for the current position\n"
+                    "- Do NOT suggest moves that are impossible (e.g., moving pawns that have already moved)\n"
+                    "- Consider the actual piece positions, not generic opening theory\n"
+                    "- Analyze the full board position to determine the best strategic move\n"
+                    '- Respond with ONLY a move in the format "from_pos to_pos" (e.g., "e7 e5")\n'
+                    "- Do not include any explanations or additional text - just the move coordinates\n\n"
+                    'RESPONSE FORMAT: Respond with exactly "from_pos to_pos" (e.g., "e7 e5")'
+                ),
             }
 
-            analysis_prompt = f"""CURRENT BOARD POSITION (FEN): {fen}
-            CURRENT TURN: {turn}
-            MOVES PLAYED: {len(move_history)}
-
-            IMPORTANT: Analyze this EXACT position. Do not suggest generic opening moves.
-            Look at what pieces are actually on the board and where they can legally move.
-
-            Please suggest the best legal move for this specific position:"""
+            analysis_prompt = (
+                f"CURRENT BOARD POSITION (FEN): {fen}\n"
+                f"CURRENT TURN: {turn}\n"
+                f"MOVES PLAYED: {len(move_history)}\n\n"
+                f"IMPORTANT: Analyze this EXACT position. Do not suggest generic opening moves.\n"
+                f"Look at what pieces are actually on the board and where they can legally move.\n\n"
+                f"Please suggest the best legal move for this specific position:"
+            )
 
             messages = [system_prompt, {"role": "user", "content": analysis_prompt}]
 
@@ -395,30 +419,32 @@ class AIService:
             # Create prompt for multiple move generation
             system_prompt = {
                 "role": "system",
-                "content": f"""You are a chess AI assistant. Analyze the EXACT current position and predict the best {num_moves} moves you would make over the next {num_moves} turns, assuming your opponent makes reasonable responses.
-
-                CRITICAL RULES:
-                - You MUST analyze the actual current board position provided in FEN notation
-                - You are predicting a SEQUENCE of moves over multiple turns, not alternative moves for the same position
-                - Consider that after each of your moves, your opponent will respond, changing the board
-                - Each move should be the best move for the position that will exist after the previous moves
-                - Consider the actual piece positions, not generic opening theory
-                - Respond with exactly {num_moves} moves in the format "move1, move2, move3, move4, move5"
-                - Each move should be in the format "from_pos to_pos" (e.g., "e7 e5")
-                - Do not include explanations - just the moves separated by commas
-
-                RESPONSE FORMAT: "e7 e5, d7 d6, g8 f6, b8 c6, f8 e7"
-                """,
+                "content": (
+                    f"You are a chess AI assistant. Analyze the EXACT current position and "
+                    f"predict the best {num_moves} moves you would make over the next {num_moves} "
+                    f"turns, assuming your opponent makes reasonable responses.\n\n"
+                    f"CRITICAL RULES:\n"
+                    f"- You MUST analyze the actual current board position provided in FEN notation\n"
+                    f"- You are predicting a SEQUENCE of moves over multiple turns, not alternative "
+                    f"moves for the same position\n"
+                    f"- Consider that after each of your moves, your opponent will respond, changing the board\n"
+                    f"- Each move should be the best move for the position that will exist after the previous moves\n"
+                    f"- Consider the actual piece positions, not generic opening theory\n"
+                    f'- Respond with exactly {num_moves} moves in the format "move1, move2, move3, move4, move5"\n'
+                    f'- Each move should be in the format "from_pos to_pos" (e.g., "e7 e5")\n'
+                    f"- Do not include explanations - just the moves separated by commas\n\n"
+                    f'RESPONSE FORMAT: "e7 e5, d7 d6, g8 f6, b8 c6, f8 e7"'
+                ),
             }
 
-            analysis_prompt = f"""CURRENT BOARD POSITION (FEN): {fen}
-            CURRENT TURN: {turn}
-            MOVES PLAYED: {len(move_history)}
-
-            IMPORTANT: Analyze this EXACT position and predict your next {num_moves} moves.
-            Consider how the board will change after each move and your opponent's likely responses.
-
-            Please predict the best {num_moves} moves you would make over the next {num_moves} turns:"""
+            analysis_prompt = (
+                f"CURRENT BOARD POSITION (FEN): {fen}\n"
+                f"CURRENT TURN: {turn}\n"
+                f"MOVES PLAYED: {len(move_history)}\n\n"
+                f"IMPORTANT: Analyze this EXACT position and predict your next {num_moves} moves.\n"
+                f"Consider how the board will change after each move and your opponent's likely responses.\n\n"
+                f"Please predict the best {num_moves} moves you would make over the next {num_moves} turns:"
+            )
 
             messages = [system_prompt, {"role": "user", "content": analysis_prompt}]
 
@@ -460,7 +486,8 @@ class AIService:
             # Update the move queue with the valid moves
             self.move_queue = valid_moves
             logger.info(
-                f"Generated {len(valid_moves)} valid sequential moves out of {len(moves)} suggested (move_queue updated)"
+                f"Generated {len(valid_moves)} valid sequential moves out of {len(moves)} "
+                f"suggested (move_queue updated)"
             )
             return valid_moves
 
@@ -641,10 +668,29 @@ class AIService:
 
         system_prompt = {
             "role": "system",
-            "content": """You are a chess expert. You will be given a chess board state in FEN notation and a mapping of all pieces and their positions.\n\nYour job is to:\n1. List all pieces and their positions for both White and Black, exactly as given.\n2. Provide a brief, insightful analysis of the position, referring ONLY to the pieces and pawns that are actually present on the board.\n3. Do NOT mention or analyze any piece, pawn, or square that does not exist in the given board state.\n4. If a square is empty, do not mention it.\n5. If a piece is in an unusual or illegal position, mention this fact.\n\nBe precise and do not hallucinate. Your analysis must be based strictly on the provided board state.""",
+            "content": (
+                "You are a chess expert. You will be given a chess board state in FEN notation "
+                "and a mapping of all pieces and their positions.\n\n"
+                "Your job is to:\n"
+                "1. List all pieces and their positions for both White and Black, exactly as given.\n"
+                "2. Provide a brief, insightful analysis of the position, referring ONLY to the "
+                "pieces and pawns that are actually present on the board.\n"
+                "3. Do NOT mention or analyze any piece, pawn, or square that does not exist "
+                "in the given board state.\n"
+                "4. If a square is empty, do not mention it.\n"
+                "5. If a piece is in an unusual or illegal position, mention this fact.\n\n"
+                "Be precise and do not hallucinate. Your analysis must be based strictly on "
+                "the provided board state."
+            ),
         }
 
-        analysis_prompt = f"""FEN: {fen}\nCurrent turn: {turn}\n\nPieces on the board:\n{piece_listing}\n\nPlease analyze this position as described above."""
+        analysis_prompt = (
+            f"FEN: {fen}\n"
+            f"Current turn: {turn}\n\n"
+            f"Pieces on the board:\n"
+            f"{piece_listing}\n\n"
+            f"Please analyze this position as described above."
+        )
 
         messages = [system_prompt, {"role": "user", "content": analysis_prompt}]
 
@@ -680,7 +726,8 @@ class AIService:
                             turn == "black" and not is_white_piece
                         ):
                             logger.warning(
-                                f"Discarded cached move (would capture own piece): {from_pos} to {to_pos} ({from_piece} capturing {to_piece})"
+                                f"Discarded cached move (would capture own piece): {from_pos} to {to_pos} "
+                                f"({from_piece} capturing {to_piece})"
                             )
                             continue
 
@@ -691,7 +738,8 @@ class AIService:
                             turn == "black" and is_white_piece
                         ):
                             logger.warning(
-                                f"Discarded cached move (wrong piece color): {from_pos} to {to_pos} ({from_piece} is not {turn}'s piece)"
+                                f"Discarded cached move (wrong piece color): {from_pos} to {to_pos} "
+                                f"({from_piece} is not {turn}'s piece)"
                             )
                             continue
 
