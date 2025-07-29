@@ -1,6 +1,13 @@
 import logging
 from typing import Dict, List
 
+from app.core.exceptions import (
+    GameOverError,
+    GameStateError,
+    InvalidMoveError,
+    InvalidPositionError,
+)
+
 Position = str  # e.g., 'e4'
 Piece = str  # e.g., 'P', 'k', etc.
 
@@ -209,41 +216,70 @@ class ChessGame:
 
         Returns:
             bool: True if move is legal and executed, False otherwise.
+
+        Raises:
+            GameOverError: If the game is already over.
+            InvalidPositionError: If the positions are invalid.
+            InvalidMoveError: If the move is illegal.
         """
         if self.game_over:
-            logger.warning("Attempted to make a move, but the game is over.")
-            return False
+            raise GameOverError()
+
+        # Validate positions first
+        if not self.is_valid_pos(from_pos):
+            raise InvalidPositionError(
+                from_pos, {"reason": "Source position is invalid"}
+            )
+        if not self.is_valid_pos(to_pos):
+            raise InvalidPositionError(
+                to_pos, {"reason": "Destination position is invalid"}
+            )
 
         logger.debug(
             f"Attempting move from {from_pos} to {to_pos} by {self.turn} (moving piece: {self.board[from_pos]} [{self.get_piece_color(self.board[from_pos])}])."
         )
-        if not (self.is_valid_pos(from_pos) and self.is_valid_pos(to_pos)):
-            logger.warning(f"Invalid board position: from {from_pos} to {to_pos}.")
-            return False
 
         piece = self.board[from_pos]
         if piece == ".":
-            logger.warning(f"No piece at source position {from_pos}.")
-            return False
+            raise InvalidMoveError(
+                f"No piece at source position {from_pos}",
+                from_pos,
+                to_pos,
+                {"reason": "No piece at source position"},
+            )
 
         if self.get_piece_color(piece) != self.turn:
-            logger.warning(
-                f"It's {self.turn}'s turn, but tried to move {piece} ({self.get_piece_color(piece)}) from {from_pos}."
+            raise InvalidMoveError(
+                f"It's {self.turn}'s turn, but tried to move {piece} ({self.get_piece_color(piece)}) from {from_pos}",
+                from_pos,
+                to_pos,
+                {
+                    "reason": "Wrong player's turn",
+                    "current_turn": self.turn,
+                    "piece_color": self.get_piece_color(piece),
+                },
             )
-            return False
 
         target_piece = self.board[to_pos]
         if self.get_piece_color(target_piece) == self.turn:
-            logger.warning(
-                f"Invalid move: Cannot capture your own piece ({target_piece}) at {to_pos}."
+            raise InvalidMoveError(
+                f"Cannot capture your own piece ({target_piece}) at {to_pos}",
+                from_pos,
+                to_pos,
+                {"reason": "Cannot capture own piece", "target_piece": target_piece},
             )
-            return False
 
         if not self.is_legal_move(piece, from_pos, to_pos):
-            logger.warning(
-                f"Illegal move attempted: {piece} ({self.get_piece_color(piece)}) from {from_pos} to {to_pos}."
+            raise InvalidMoveError(
+                f"Illegal move: {piece} from {from_pos} to {to_pos}",
+                from_pos,
+                to_pos,
+                {
+                    "reason": "Move violates chess rules",
+                    "piece": piece,
+                    "piece_color": self.get_piece_color(piece),
+                },
             )
-            return False
 
         # Record the move before executing it
         is_capture = target_piece != "."
