@@ -3,6 +3,7 @@ import os
 import time
 from typing import Dict, List, Optional, Tuple
 
+from app.core.exceptions import AIServiceError, APIKeyError, RateLimitError
 from dotenv import find_dotenv, load_dotenv
 from groq import Groq
 
@@ -26,13 +27,18 @@ class AIService:
         Args:
             use_multi_move_cache: Whether to use multi-move caching strategy
             cache_size: Number of moves to generate ahead when using caching
+
+        Raises:
+            APIKeyError: If GROQ_API_KEY is not configured
         """
         self.api_key = os.getenv("GROQ_API_KEY")
         self.client = None
         if self.api_key:
             self.client = Groq(api_key=self.api_key)
         else:
-            logger.warning("GROQ_API_KEY not found in environment variables")
+            raise APIKeyError(
+                "Groq", {"reason": "GROQ_API_KEY environment variable not set"}
+            )
 
         self.last_request_time = 0
         self.min_request_interval = 1.0  # Minimum 1 second between requests
@@ -83,9 +89,13 @@ class AIService:
 
         Returns:
             The AI response as a string
+
+        Raises:
+            AIServiceError: If there's an error with the AI service
+            RateLimitError: If rate limit is exceeded
         """
         if not self.client:
-            return (
+            raise AIServiceError(
                 "AI service is not available. Please check your API key configuration."
             )
 
@@ -113,8 +123,14 @@ class AIService:
                 return response.choices[0].message.content or ""
 
         except Exception as e:
-            logger.error(f"Error getting AI completion: {e}")
-            return f"Sorry, I encountered an error: {str(e)}"
+            error_msg = str(e).lower()
+            if "rate limit" in error_msg or "429" in error_msg:
+                raise RateLimitError("Groq", details={"original_error": str(e)})
+            else:
+                raise AIServiceError(
+                    f"Error getting AI completion: {str(e)}",
+                    details={"original_error": str(e)},
+                )
 
     def chat_with_assistant(
         self,

@@ -62,4 +62,7 @@ def test_move_after_game_over_fails():
     # Try to make another move
     response = client.post("/move", json={"from_pos": "e2", "to_pos": "e4"})
     assert response.status_code == 409
-    assert response.json()["detail"] == "Game is over. No more moves allowed."
+    data = response.json()
+    assert data["error"] == True
+    assert data["error_code"] == "GAME_OVER"
+    assert "Game is over" in data["message"]

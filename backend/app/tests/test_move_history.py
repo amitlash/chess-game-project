@@ -1,4 +1,5 @@
 import pytest
+from app.core.exceptions import InvalidPositionError
 from app.core.game_engine import ChessGame
 
 
@@ -84,9 +85,9 @@ class TestMoveHistory:
         initial_history_length = len(game.move_history)
 
         # Try to make an invalid move
-        success = game.make_move("e2", "e9")  # Invalid position
+        with pytest.raises(InvalidPositionError):
+            game.make_move("e2", "e9")  # Invalid position
 
-        assert not success
         assert len(game.move_history) == initial_history_length
 
     def test_move_history_includes_turn_number(self):

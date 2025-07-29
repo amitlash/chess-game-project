@@ -1,5 +1,6 @@
 import unittest
 
+from app.core.exceptions import GameOverError, InvalidMoveError, InvalidPositionError
 from app.core.game_engine import ChessGame
 
 
@@ -24,16 +25,22 @@ class TestChessGame(unittest.TestCase):
 
     def test_move_from_empty_square_fails(self):
         """Test that moving a piece from an empty square fails."""
-        self.assertFalse(self.game.make_move("e3", "e4"))
+        with self.assertRaises(InvalidMoveError) as context:
+            self.game.make_move("e3", "e4")
+        self.assertIn("No piece at source position", str(context.exception))
 
     def test_cannot_capture_own_piece(self):
         """Test that a piece cannot capture another piece of the same color."""
-        self.assertFalse(self.game.make_move("e1", "d1"))  # King to queen
+        with self.assertRaises(InvalidMoveError) as context:
+            self.game.make_move("e1", "d1")  # King to queen
+        self.assertIn("Cannot capture your own piece", str(context.exception))
 
     def test_turn_enforced_properly(self):
         """Test that players cannot move twice in a row."""
         self.game.make_move("e2", "e4")  # White
-        self.assertFalse(self.game.make_move("d2", "d4"))  # White again
+        with self.assertRaises(InvalidMoveError) as context:
+            self.game.make_move("d2", "d4")  # White again
+        self.assertIn("It's black's turn", str(context.exception))
 
     def test_capture_and_update_successful(self):
         """Test that capturing an enemy piece works and updates the board."""
@@ -52,7 +59,9 @@ class TestChessGame(unittest.TestCase):
 
     def test_bishop_cannot_jump(self):
         """Test that a bishop cannot jump over other pieces."""
-        self.assertFalse(self.game.make_move("f1", "c4"))
+        with self.assertRaises(InvalidMoveError) as context:
+            self.game.make_move("f1", "c4")
+        self.assertIn("Illegal move", str(context.exception))
 
     def test_knight_can_jump(self):
         """Test that a knight can jump over other pieces."""
@@ -61,12 +70,16 @@ class TestChessGame(unittest.TestCase):
 
     def test_rook_cannot_jump_over_pieces(self):
         """Test that a rook cannot move through other pieces."""
-        self.assertFalse(self.game.make_move("a1", "a4"))
+        with self.assertRaises(InvalidMoveError) as context:
+            self.game.make_move("a1", "a4")
+        self.assertIn("Illegal move", str(context.exception))
 
     def test_pawn_blocked_from_double_move(self):
         """Test that a pawn cannot double move if blocked on the path."""
         self.game.board["e3"] = "x"
-        self.assertFalse(self.game.make_move("e2", "e4"))
+        with self.assertRaises(InvalidMoveError) as context:
+            self.game.make_move("e2", "e4")
+        self.assertIn("Illegal move", str(context.exception))
 
     def test_cannot_move_after_game_over(self):
         """Test that no more moves can be made once the game is over."""
@@ -83,10 +96,9 @@ class TestChessGame(unittest.TestCase):
 
         # Attempt another move with white (the winning color)
         self.game.board["a1"] = "R"  # Add a rook to move
-        self.assertFalse(
-            self.game.make_move("a1", "a2"),
-            "Should not be able to move after game is over.",
-        )
+        with self.assertRaises(GameOverError) as context:
+            self.game.make_move("a1", "a2")
+        self.assertIn("Game is over", str(context.exception))
 
 
 if __name__ == "__main__":

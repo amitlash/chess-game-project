@@ -14,10 +14,10 @@
 ## 🎯 Project Phases
 
 ### Phase 1: Backend Enhancement
-- [~] Implement proper error handling
-  - [ ] Create custom error classes
-  - [ ] Add error middleware
-  - [~] Standardize error responses (partially, via HTTPException)
+- [x] Implement proper error handling
+  - [x] Create custom error classes
+  - [x] Add error middleware
+  - [x] Standardize error responses
 - [~] Add game state validation
   - [ ] Check/checkmate detection
   - [ ] Stalemate detection
