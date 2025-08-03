@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'http://ip172-18-0-14-d27ki8k69qi000aid0cg-8000.direct.labs.play-with-docker.com';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';

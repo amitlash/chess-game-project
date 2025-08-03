@@ -7,7 +7,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-HOST=${1:-127.0.0.1}
+HOST=${1:-0.0.0.0}
 PORT=${2:-8000}
 
 export PYTHONPATH="$SCRIPT_DIR"
